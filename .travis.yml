@@ -16,7 +16,7 @@ deploy:
   api_key:
     secure: dr3HsQVYSFTT2Y5xSzIn5WtmRTVHCcU9hr9Vcnj3npsh9FeZrH9HdtrcX3FWCVxXwcwTenc87syL7PT36J1EXjLfEl/eMC11rR4lQMD+GnlH8wrrAIT3yYwY9PLnHrtSHMBHJ79jyjaAmOD5Iv3AtLJCtmwz4spbSD/nmcESd/DM3gemQFOT0K6e+cA1otSSlBswlEzoMsHpMrwFJrRXUDjePG+Z9yuYpRDX+IYw5o3n0WN+nWx6Y8/O4Gh/DUnwUOfN/xvmbuKK7TUKxDnPCCFj7s69qZcAzkPwVaUXuu7g4pYIlRRBy2TbKFsowBmWB+n758Z2Px5yPA2YDXIqa+C+TFuHnYXiTSBo26x0Yi0h0BZmUXlujwoKv97BiGLjZv6rAr66qc51Dfsd9K6Cu5e6DbhjI+osi+Xwv1sSvJnLbssIMDHmbjINApJXDTGfq/fsZUIzY8F7HI4dGK1Og7nm+gDadnVj1CfyVcrIrNcDjzTg4JJuzS+FfRNPvOEqf/AG1dS9DoyOfIT7ASMOzwo7vVM1sseIeHx9u7cWgp9cfgh3zQkGfdUbqaBvbAQqPCkKu97Psw1rAAV+o42HPtIQxBYVXyR4jbjQ7fDA15m4PcCU6l4M4jJS/88iRhS1knUSuBj9zeNwfs1Tl9UkstBfBfB+DQG1u+/kH8mfi+E=
   file_glob: true
-  file: espurna/firmware/espurna-*.bin
+  file: espurna/firmware/**/*
   skip_cleanup: true
   on:
     repo: mcspr/espurna-travis-test
@@ -25,7 +25,9 @@ deploy:
 
 stages:
   - name: "build environment"
+    if: tag IS present
   - name: "release"
+    if: tag IS present
 
 jobs:
   fast_finish: true
@@ -33,7 +35,8 @@ jobs:
   - stage: "build environment"
     install:
       - rm -rf espurna && git clone --depth=1 https://github.com/xoseperez/espurna
-      - cd espurna/code && npm install --only=dev && node node_modules/gulp/bin/gulp.js
+      - pip install -U platformio
+      - .travis/prepare.py espurna/code
     script: skip
   - stage: "release"
     script: .travis/build espurna-core-1MB
