@@ -1,0 +1,136 @@
+language: python
+python:
+- '2.7'
+sudo: false
+
+cache:
+  directories:
+  - ${HOME}/.cache/pip
+  - espurna/
+
+install:
+  - pip install -U platformio
+
+deploy:
+  provider: releases
+  api_key:
+    secure: dr3HsQVYSFTT2Y5xSzIn5WtmRTVHCcU9hr9Vcnj3npsh9FeZrH9HdtrcX3FWCVxXwcwTenc87syL7PT36J1EXjLfEl/eMC11rR4lQMD+GnlH8wrrAIT3yYwY9PLnHrtSHMBHJ79jyjaAmOD5Iv3AtLJCtmwz4spbSD/nmcESd/DM3gemQFOT0K6e+cA1otSSlBswlEzoMsHpMrwFJrRXUDjePG+Z9yuYpRDX+IYw5o3n0WN+nWx6Y8/O4Gh/DUnwUOfN/xvmbuKK7TUKxDnPCCFj7s69qZcAzkPwVaUXuu7g4pYIlRRBy2TbKFsowBmWB+n758Z2Px5yPA2YDXIqa+C+TFuHnYXiTSBo26x0Yi0h0BZmUXlujwoKv97BiGLjZv6rAr66qc51Dfsd9K6Cu5e6DbhjI+osi+Xwv1sSvJnLbssIMDHmbjINApJXDTGfq/fsZUIzY8F7HI4dGK1Og7nm+gDadnVj1CfyVcrIrNcDjzTg4JJuzS+FfRNPvOEqf/AG1dS9DoyOfIT7ASMOzwo7vVM1sseIeHx9u7cWgp9cfgh3zQkGfdUbqaBvbAQqPCkKu97Psw1rAAV+o42HPtIQxBYVXyR4jbjQ7fDA15m4PcCU6l4M4jJS/88iRhS1knUSuBj9zeNwfs1Tl9UkstBfBfB+DQG1u+/kH8mfi+E=
+  file_glob: true
+  file: espurna/firmware/espurna-*.bin
+  skip_cleanup: true
+  on:
+    repo: mcspr/espurna-travis-test
+    branch: builder
+    tags: true
+
+stages:
+  - name: "build environment"
+  - name: "test"
+    if: branch in (dev,master) and type in (push,pull_request)
+  - name: "release"
+    if: branch = builder
+
+jobs:
+  include:
+  - stage: "build environment"
+    install:
+      - rm -rf espurna && git clone --depth=1 https://github.com/xoseperez/espurna
+      - cd espurna/code && npm install --only=dev && node node_modules/gulp/bin/gulp.js
+    script: skip
+  - stage: "test"
+    script: pio run -s -d espurna/code/ -e travis01
+  - script: pio run -s -d espurna/code/ -e travis02
+  - script: pio run -s -d espurna/code/ -e travis03
+  - stage: "release"
+    script: .travis/build espurna-core-1MB
+  - script: .travis/build espurna-core-4MB
+  - script: .travis/build wemos-d1mini-relayshield
+  - script: .travis/build wemos-d1mini-relayshield-ssl
+  - script: .travis/build nodemcu-lolin
+  - script: .travis/build nodemcu-lolin-ssl
+  - script: .travis/build tinkerman-espurna-h06
+  - script: .travis/build tinkerman-espurna-h08
+  - script: .travis/build tinkerman-espurna-switch
+  - script: .travis/build wemos-d1-tarpunashield
+  - script: .travis/build itead-sonoff-basic
+  - script: .travis/build itead-sonoff-basic-dht
+  - script: .travis/build itead-sonoff-basic-dallas
+  - script: .travis/build itead-sonoff-rf
+  - script: .travis/build itead-sonoff-th
+  - script: .travis/build itead-sonoff-pow
+  - script: .travis/build itead-sonoff-pow-r2
+  - script: .travis/build itead-sonoff-dual
+  - script: .travis/build itead-sonoff-dual-r2
+  - script: .travis/build itead-sonoff-dual-ota-r2
+  - script: .travis/build itead-sonoff-4ch
+  - script: .travis/build itead-sonoff-4ch-pro
+  - script: .travis/build itead-sonoff-touch
+  - script: .travis/build itead-sonoff-b1
+  - script: .travis/build itead-sonoff-t1-1ch
+  - script: .travis/build itead-sonoff-t1-2ch
+  - script: .travis/build itead-sonoff-t1-3ch
+  - script: .travis/build itead-sonoff-led
+  - script: .travis/build itead-sonoff-rfbridge
+  - script: .travis/build itead-sonoff-rfbridge-direct
+  - script: .travis/build itead-slampher
+  - script: .travis/build itead-s20
+  - script: .travis/build itead-1ch-inching
+  - script: .travis/build itead-motor
+  - script: .travis/build itead-sonoff-sv
+  - script: .travis/build itead-sonoff-s31
+  - script: .travis/build electrodragon-wifi-iot
+  - script: .travis/build workchoice-ecoplug
+  - script: .travis/build jangoe-wifi-relay-nc
+  - script: .travis/build jangoe-wifi-relay-no
+  - script: .travis/build openenergymonitor-mqtt-relay
+  - script: .travis/build jorgegarcia-wifi-relays
+  - script: .travis/build aithinker-ai-light
+  - script: .travis/build magichome-led-controller
+  - script: .travis/build magichome-led-controller-20
+  - script: .travis/build huacanxing-h801
+  - script: .travis/build huacanxing-h802
+  - script: .travis/build arilux-al-lc01
+  - script: .travis/build arilux-al-lc02
+  - script: .travis/build arilux-al-lc06
+  - script: .travis/build arilux-al-lc11
+  - script: .travis/build arilux-e27
+  - script: .travis/build itead-bnsz01
+  - script: .travis/build wion-50055
+  - script: .travis/build exs-wifi-relay-v31
+  - script: .travis/build wemos-v9261f
+  - script: .travis/build esp01-v9261f
+  - script: .travis/build wemos-ech1560
+  - script: .travis/build esp01-ech1560
+  - script: .travis/build mancavemade-esplive
+  - script: .travis/build intermittech-quinled
+  - script: .travis/build xenon-sm-pw702u
+  - script: .travis/build authometion-lyt8266
+  - script: .travis/build kmc-70011
+  - script: .travis/build yjzk-switch-2ch
+  - script: .travis/build generic-8ch
+  - script: .travis/build gizwits-witty-cloud
+  - script: .travis/build euromate-wifi-stecker-shuko
+  - script: .travis/build tonbux-powerstrip02
+  - script: .travis/build lingan-swa1
+  - script: .travis/build stm-relay
+  - script: .travis/build heygo-hy02
+  - script: .travis/build maxcio-wus002s
+  - script: .travis/build yidian-xsssa05
+  - script: .travis/build tonbux-xsssa06
+  - script: .travis/build green-esp8266relay
+  - script: .travis/build ike-espike
+  - script: .travis/build arniex-swifitch
+  - script: .travis/build zhilde-eu44-w
+  - script: .travis/build luani-hvio
+  - script: .travis/build neo-coolcam-power-plug-wifi
+  - script: .travis/build estink-wifi-power-strip
+  - script: .travis/build generic-esp01s-relay-40
+  - script: .travis/build generic-esp01s-rgbled-10
+  - script: .travis/build generic-esp01s-dht11-10
+  - script: .travis/build generic-esp01s-ds18b20-10
+  - script: .travis/build heltec-touch-relay
+  - script: .travis/build allnet-4duino-iot-wlan-relais
+  - script: .travis/build tonbux-mosquito-killer
+  - script: .travis/build pilotak-esp-din-v1
+  - script: .travis/build nodemcu-geiger
+

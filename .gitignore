@@ -1,0 +1,17 @@
+*.s#?
+*.b#?
+.modgit
+firmware*
+*.gch
+.pio*
+.clang_complete
+.gcc-flags.json
+.sconsign.dblite
+credentials.h
+node_modules
+code/utils
+custom.h
+.python
+.env
+.DS_Store
+.vscode
