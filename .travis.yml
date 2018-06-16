@@ -6,7 +6,8 @@ sudo: false
 cache:
   directories:
   - ${HOME}/.cache/pip
-  - espurna/
+  - ${HOME}/.platformio
+  - ${HOME}/espurna/
 
 install:
   - pip install -U platformio
@@ -23,6 +24,10 @@ deploy:
     branch: builder
     tags: true
 
+after_script:
+  - rm -rf espurna/firmware/
+  - rm -rf espurna/code/.pioenvs
+
 stages:
   - name: "build environment"
     if: tag IS present
@@ -36,6 +41,7 @@ jobs:
     install:
       - rm -rf espurna && git clone --depth=1 https://github.com/xoseperez/espurna
       - pip install -U platformio
+      - pushd espurna/code/ && npm install --only=dev && popd
       - .travis/prepare.py espurna/code
     script: skip
   - stage: "release"
