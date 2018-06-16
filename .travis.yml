@@ -25,22 +25,16 @@ deploy:
 
 stages:
   - name: "build environment"
-  - name: "test"
-    if: branch in (dev,master) and type in (push,pull_request)
   - name: "release"
-    if: branch = builder
 
 jobs:
+  fast_finish: true
   include:
   - stage: "build environment"
     install:
       - rm -rf espurna && git clone --depth=1 https://github.com/xoseperez/espurna
       - cd espurna/code && npm install --only=dev && node node_modules/gulp/bin/gulp.js
     script: skip
-  - stage: "test"
-    script: pio run -s -d espurna/code/ -e travis01
-  - script: pio run -s -d espurna/code/ -e travis02
-  - script: pio run -s -d espurna/code/ -e travis03
   - stage: "release"
     script: .travis/build espurna-core-1MB
   - script: .travis/build espurna-core-4MB
