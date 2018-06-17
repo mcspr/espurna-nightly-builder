@@ -19,18 +19,17 @@ prepare-pio:
         - apt-get update -qq && apt-get install -y -qq python-virtualenv python-pip
         - virtualenv ./platformio
         - python -V
+        - pip install -U platformio
 
 
 prepare-build:
     stage: prepare-build
     artifacts:
         paths:
-            - espurna/code/node_modules
-            - espurna/code/.piolibdeps
+            - espurna
             - .platformio
     script:
         - . platformio/bin/activate
-        - pip install -U platformio
         - git clone --depth=1 https://github.com/xoseperez/espurna
         - python2 prepare.py espurna/code
 
