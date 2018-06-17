@@ -22,7 +22,6 @@ prepare:platformio:
         - virtualenv ./platformio
         - . platformio/bin/activate
         - pip install -U platformio
-        - ls -l platformio/bin
         - git clone --depth=1 https://github.com/xoseperez/espurna
         - python2 prepare.py espurna/code
 
@@ -35,8 +34,8 @@ build:espurna-core-1MB:
              - espurna/firmware/
      script:
          - . platformio/bin/activate
-         - pip freeze
-         - pip install -U platformio
+         - echo $HOME && pwd
+         - ls $HOME/platformio
          - cd espurna/code && ./build.sh espurna-core-1MB
 
 
@@ -48,6 +47,6 @@ build:espurna-core-4MB:
              - espurna/firmware/
      script:
          - . platformio/bin/activate
-         - pip freeze
-         - pip install -U platformio
          - cd espurna/code && ./build.sh espurna-core-1MB
+     only:
+         - tags
