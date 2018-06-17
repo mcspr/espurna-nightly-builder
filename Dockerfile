@@ -1,11 +1,11 @@
-FROM python:2.7-stretch
+FROM alpine:3.7
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update -q && \
-    apt-get install -q -y curl apt-transport-https && \
-    curl -sSO https://deb.nodesource.com/gpgkey/nodesource.gpg.key && \
-    apt-key add nodesource.gpg.key && \
-    echo "deb https://deb.nodesource.com/node_8.x stretch main" > /etc/apt/sources.list.d/nodesource.list && \
-    apt-get update -q && \
-    apt-get install -y nodejs
+RUN apk add --update --no-cache -q --progress \
+    python2 \
+    py2-pip \
+    py2-virtualenv \
+    nodejs && \
+    npm update -g npm && \
+    rm -rf ~/.npm/
 
-CMD ["/bin/bash"]
+CMD ["/bin/sh"]
