@@ -29,7 +29,14 @@ def get_pio_libraries(cwd, platformio_ini="platformio.ini"):
 def pio_prepare(cwd, libraries, platforms):
     def run(exit_code):
         def wrapper(cmd):
-            return subprocess.call(cmd, cwd=cwd) == exit_code
+            code = 1
+
+            try:
+                code = subprocess.call(cmd, cwd=cwd)
+            except OSError as e:
+                print(e, ' '.join(cmd))
+
+            return (code == 0)
 
         return wrapper
 

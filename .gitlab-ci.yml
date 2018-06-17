@@ -1,8 +1,7 @@
 image: node:8-stretch
 
 stages:
-    - prepare-pio
-    - prepare-build
+    - prepare
     - build
 
 
@@ -10,8 +9,8 @@ before_script:
     - export DEBIAN_FRONTEND=noninteractive
 
       
-prepare-pio:
-    stage: prepare-pio
+prepare:platformio:
+    stage: prepare
     artifacts:
         paths:
             - platformio
@@ -20,18 +19,21 @@ prepare-pio:
         - virtualenv ./platformio
         - python -V
         - pip install -U platformio
-
-
-prepare-build:
-    stage: prepare-build
-    artifacts:
-        paths:
-            - espurna
-            - .platformio
-    script:
         - . platformio/bin/activate
         - git clone --depth=1 https://github.com/xoseperez/espurna
         - python2 prepare.py espurna/code
+
+
+#prepare-build:
+#    stage: prepare-build
+#    artifacts:
+#        paths:
+#            - espurna
+#            - .platformio
+#    script:
+#        - . platformio/bin/activate
+#        - git clone --depth=1 https://github.com/xoseperez/espurna
+#        - python2 prepare.py espurna/code
 
 
 build:espurna-core-1MB:
