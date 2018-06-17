@@ -15,11 +15,12 @@ prepare:platformio:
         paths:
             - platformio
             - espurna
-            - .platformio
+            - ~/.platformio
     script:
         - apt-get update -qq && apt-get install -y -qq python-virtualenv python-pip
         - virtualenv ./platformio
         - python -V
+        - pwd
         - pip install -U platformio
         - . platformio/bin/activate
         - git clone --depth=1 https://github.com/xoseperez/espurna
