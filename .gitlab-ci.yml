@@ -14,6 +14,8 @@ prepare:platformio:
     artifacts:
         paths:
             - platformio
+            - espurna
+            - .platformio
     script:
         - apt-get update -qq && apt-get install -y -qq python-virtualenv python-pip
         - virtualenv ./platformio
@@ -25,11 +27,10 @@ prepare:platformio:
 
 
 #prepare-build:
-#    stage: prepare-build
+#    stage: prepare
 #    artifacts:
 #        paths:
 #            - espurna
-#            - .platformio
 #    script:
 #        - . platformio/bin/activate
 #        - git clone --depth=1 https://github.com/xoseperez/espurna
