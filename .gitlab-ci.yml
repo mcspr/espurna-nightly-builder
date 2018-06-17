@@ -32,8 +32,7 @@ prepare-build:
         - . platformio/bin/activate
         - pip install -U platformio
         - git clone --depth=1 https://github.com/xoseperez/espurna
-        - python2 prepare.py
-        - cd espurna/code && npm install --only=dev
+        - python2 prepare.py espurna/code
 
 
 build:espurna-core-1MB:

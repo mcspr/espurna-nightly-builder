@@ -41,7 +41,10 @@ def pio_prepare(cwd, libraries, platforms):
 
     # - explicitly install required libraries so each job has lib dependencies ready
     # - run dummy project to test compiler and install tool-scons
-    commands = [[run(0), ["platformio", "lib", "install"] + libraries]]
+    commands = [
+            [run(0), ["platformio", "lib", "install"] + libraries],
+            [run(0), ["npm", "install", "--only=dev"]]
+    ]
     for platform in platforms:
         tmpdir = tempfile.mkdtemp()
 
