@@ -54,3 +54,983 @@ build:espurna-core-4MB:
          - . platformio/bin/activate
          - cd espurna/code
          - ./build.sh espurna-core-4MB
+
+
+build:wemos-d1mini-relayshield:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh wemos-d1mini-relayshield
+
+
+build:wemos-d1mini-relayshield-ssl:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh wemos-d1mini-relayshield-ssl
+
+
+build:nodemcu-lolin:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh nodemcu-lolin
+
+
+build:nodemcu-lolin-ssl:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh nodemcu-lolin-ssl
+
+
+build:tinkerman-espurna-h06:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh tinkerman-espurna-h06
+
+
+build:tinkerman-espurna-h08:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh tinkerman-espurna-h08
+
+
+build:tinkerman-espurna-switch:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh tinkerman-espurna-switch
+
+
+build:wemos-d1-tarpunashield:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh wemos-d1-tarpunashield
+
+
+build:itead-sonoff-basic:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-basic
+
+
+build:itead-sonoff-basic-dht:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-basic-dht
+
+
+build:itead-sonoff-basic-dallas:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-basic-dallas
+
+
+build:itead-sonoff-rf:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-rf
+
+
+build:itead-sonoff-th:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-th
+
+
+build:itead-sonoff-pow:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-pow
+
+
+build:itead-sonoff-pow-r2:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-pow-r2
+
+
+build:itead-sonoff-dual:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-dual
+
+
+build:itead-sonoff-dual-r2:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-dual-r2
+
+
+build:itead-sonoff-dual-ota-r2:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-dual-ota-r2
+
+
+build:itead-sonoff-4ch:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-4ch
+
+
+build:itead-sonoff-4ch-pro:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-4ch-pro
+
+
+build:itead-sonoff-touch:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-touch
+
+
+build:itead-sonoff-b1:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-b1
+
+
+build:itead-sonoff-t1-1ch:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-t1-1ch
+
+
+build:itead-sonoff-t1-2ch:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-t1-2ch
+
+
+build:itead-sonoff-t1-3ch:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-t1-3ch
+
+
+build:itead-sonoff-led:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-led
+
+
+build:itead-sonoff-rfbridge:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-rfbridge
+
+
+build:itead-sonoff-rfbridge-direct:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-rfbridge-direct
+
+
+build:itead-slampher:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-slampher
+
+
+build:itead-s20:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-s20
+
+
+build:itead-1ch-inching:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-1ch-inching
+
+
+build:itead-motor:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-motor
+
+
+build:itead-sonoff-sv:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-sv
+
+
+build:itead-sonoff-s31:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-sonoff-s31
+
+
+build:electrodragon-wifi-iot:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh electrodragon-wifi-iot
+
+
+build:workchoice-ecoplug:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh workchoice-ecoplug
+
+
+build:jangoe-wifi-relay-nc:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh jangoe-wifi-relay-nc
+
+
+build:jangoe-wifi-relay-no:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh jangoe-wifi-relay-no
+
+
+build:openenergymonitor-mqtt-relay:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh openenergymonitor-mqtt-relay
+
+
+build:jorgegarcia-wifi-relays:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh jorgegarcia-wifi-relays
+
+
+build:aithinker-ai-light:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh aithinker-ai-light
+
+
+build:magichome-led-controller:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh magichome-led-controller
+
+
+build:magichome-led-controller-20:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh magichome-led-controller-20
+
+
+build:huacanxing-h801:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh huacanxing-h801
+
+
+build:huacanxing-h802:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh huacanxing-h802
+
+
+build:arilux-al-lc01:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh arilux-al-lc01
+
+
+build:arilux-al-lc02:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh arilux-al-lc02
+
+
+build:arilux-al-lc06:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh arilux-al-lc06
+
+
+build:arilux-al-lc11:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh arilux-al-lc11
+
+
+build:arilux-e27:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh arilux-e27
+
+
+build:itead-bnsz01:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh itead-bnsz01
+
+
+build:wion-50055:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh wion-50055
+
+
+build:exs-wifi-relay-v31:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh exs-wifi-relay-v31
+
+
+build:wemos-v9261f:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh wemos-v9261f
+
+
+build:esp01-v9261f:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh esp01-v9261f
+
+
+build:wemos-ech1560:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh wemos-ech1560
+
+
+build:esp01-ech1560:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh esp01-ech1560
+
+
+build:mancavemade-esplive:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh mancavemade-esplive
+
+
+build:intermittech-quinled:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh intermittech-quinled
+
+
+build:xenon-sm-pw702u:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh xenon-sm-pw702u
+
+
+build:authometion-lyt8266:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh authometion-lyt8266
+
+
+build:kmc-70011:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh kmc-70011
+
+
+build:yjzk-switch-2ch:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh yjzk-switch-2ch
+
+
+build:generic-8ch:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh generic-8ch
+
+
+build:gizwits-witty-cloud:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh gizwits-witty-cloud
+
+
+build:euromate-wifi-stecker-shuko:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh euromate-wifi-stecker-shuko
+
+
+build:tonbux-powerstrip02:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh tonbux-powerstrip02
+
+
+build:lingan-swa1:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh lingan-swa1
+
+
+build:stm-relay:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh stm-relay
+
+
+build:heygo-hy02:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh heygo-hy02
+
+
+build:maxcio-wus002s:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh maxcio-wus002s
+
+
+build:yidian-xsssa05:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh yidian-xsssa05
+
+
+build:tonbux-xsssa06:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh tonbux-xsssa06
+
+
+build:green-esp8266relay:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh green-esp8266relay
+
+
+build:ike-espike:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh ike-espike
+
+
+build:arniex-swifitch:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh arniex-swifitch
+
+
+build:zhilde-eu44-w:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh zhilde-eu44-w
+
+
+build:luani-hvio:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh luani-hvio
+
+
+build:neo-coolcam-power-plug-wifi:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh neo-coolcam-power-plug-wifi
+
+
+build:estink-wifi-power-strip:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh estink-wifi-power-strip
+
+
+build:generic-esp01s-relay-40:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh generic-esp01s-relay-40
+
+
+build:generic-esp01s-rgbled-10:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh generic-esp01s-rgbled-10
+
+
+build:generic-esp01s-dht11-10:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh generic-esp01s-dht11-10
+
+
+build:generic-esp01s-ds18b20-10:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh generic-esp01s-ds18b20-10
+
+
+build:heltec-touch-relay:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh heltec-touch-relay
+
+
+build:allnet-4duino-iot-wlan-relais:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh allnet-4duino-iot-wlan-relais
+
+
+build:tonbux-mosquito-killer:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh tonbux-mosquito-killer
+
+
+build:pilotak-esp-din-v1:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh pilotak-esp-din-v1
+
+
+build:nodemcu-geiger:
+     stage: build
+     artifacts:
+         paths:
+             - espurna/firmware/
+     script:
+         - . platformio/bin/activate
+         - cd espurna/code
+         - ./build.sh nodemcu-geiger
+
