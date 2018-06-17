@@ -11,6 +11,8 @@ cache:
 
 install:
   - pip install -U platformio
+  - rm -rf espurna && git clone --depth=1 https://github.com/xoseperez/espurna
+  - pushd espurna/code/ && npm install --only=dev && popd
 
 deploy:
   provider: releases
@@ -29,21 +31,12 @@ after_script:
   - rm -rf espurna/code/.pioenvs
 
 stages:
-  - name: "build environment"
-    if: tag IS present
   - name: "release"
     if: tag IS present
 
 jobs:
   fast_finish: true
   include:
-  - stage: "build environment"
-    install:
-      - rm -rf espurna && git clone --depth=1 https://github.com/xoseperez/espurna
-      - pip install -U platformio
-      - pushd espurna/code/ && npm install --only=dev && popd
-      - .travis/prepare.py espurna/code
-    script: skip
   - stage: "release"
-    script: .travis/build gizwits-witty-cloud
-  - script: .travis/build itead-sonoff-s31
+    script: ./build.sh gizwits-witty-cloud
+  - script: ./build.sh itead-sonoff-s31

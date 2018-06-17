@@ -85,7 +85,10 @@ def pio_prepare(cwd, libraries, platforms):
 
 
 if __name__ == "__main__":
-    root = os.getcwd()
+    root = os.environ.get("TRAVIS_BUILD_DIR")
+    if not root:
+        root = os.getcwd()
+
     _, rel_path = sys.argv
 
     base = os.path.join(root, rel_path)
