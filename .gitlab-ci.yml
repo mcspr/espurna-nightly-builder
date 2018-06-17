@@ -6,6 +6,10 @@ stages:
     - build
 
 
+before_script:
+    - export PLATFORMIO_HOME_DIR=~/platformio/home_dir
+
+
 prepare:platformio:
     stage: prepare
     artifacts:
@@ -13,12 +17,12 @@ prepare:platformio:
         paths:
             - platformio
             - espurna
-            - ~/.platformio
     script:
         - python -V
         - virtualenv ./platformio
         - . platformio/bin/activate
         - pip install -U platformio
+        - ls -l platformio/bin
         - git clone --depth=1 https://github.com/xoseperez/espurna
         - python2 prepare.py espurna/code
 
