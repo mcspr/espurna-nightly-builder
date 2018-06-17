@@ -1,3 +1,5 @@
+image: node:8-stretch
+
 stages:
     - prepare-pio
     - prepare-build
@@ -14,7 +16,7 @@ prepare-pio:
         paths:
             - platformio
     script:
-        - apt-get update -qq && apt-get install -y -qq nodejs python2-virtualenv python2-pip
+        - apt-get update -qq && apt-get install -y -qq python-virtualenv python-pip
         - virtualenv ./platformio
         - python -V
 
