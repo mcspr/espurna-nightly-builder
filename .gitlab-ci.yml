@@ -1,12 +1,15 @@
 stages:
-    - prepare
+    - prepare-pio
+    - prepare-build
     - build
+
 
 before_script:
     - export DEBIAN_FRONTEND=noninteractive
+
       
-prepare:platformio:
-    stage: prepare
+prepare-pio:
+    stage: prepare-pio
     artifacts:
         paths:
             - platformio
@@ -14,12 +17,10 @@ prepare:platformio:
         - apt-get update -qq && apt-get install -y -qq nodejs python2-virtualenv python2-pip
         - virtualenv ./platformio
         - python -V
-        - pip install -U platformio
 
-prepare:builder:
-    dependencies:
-    - prepare:platformio
-    stage: prepare
+
+prepare-build:
+    stage: prepare-build
     artifacts:
         paths:
             - espurna/code/node_modules
@@ -27,13 +28,13 @@ prepare:builder:
             - espurna/.platformio
     script:
         - . platformio/bin/activate
+        - pip install -U platformio
         - git clone --depth=1 https://github.com/xoseperez/espurna
         - python2 prepare.py
         - cd espurna/code && npm install --only=dev
 
+
 build:espurna-core-1MB:
-     dependencies:
-         - prepare:builder
      stage: build
      artifacts:
          paths:
@@ -43,9 +44,8 @@ build:espurna-core-1MB:
          - cd espurna/code
          - ./build.sh espurna-core-1MB
 
+
 build:espurna-core-4MB:
-     dependencies:
-         - prepare:builder
      stage: build
      artifacts:
          paths:
