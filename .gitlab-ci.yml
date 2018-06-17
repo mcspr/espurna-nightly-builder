@@ -9,7 +9,7 @@ prepare:platformio:
     stage: prepare
     artifacts:
         paths:
-            platformio
+            - platformio
     script:
         - apt-get update -qq && apt-get install -y -qq nodejs python2-virtualenv python2-pip
         - virtualenv ./platformio
@@ -22,9 +22,9 @@ prepare:builder:
     stage: prepare
     artifacts:
         paths:
-            espurna/code/node_modules
-            espurna/code/.piolibdeps
-            espurna/.platformio
+            - espurna/code/node_modules
+            - espurna/code/.piolibdeps
+            - espurna/.platformio
     script:
         - . platformio/bin/activate
         - git clone --depth=1 https://github.com/xoseperez/espurna
@@ -37,7 +37,7 @@ build:espurna-core-1MB:
      stage: build
      artifacts:
          paths:
-             espurna/firmware/
+             - espurna/firmware/
      script:
          - . platformio/bin/activate
          - cd espurna/code
@@ -49,7 +49,7 @@ build:espurna-core-4MB:
      stage: build
      artifacts:
          paths:
-             espurna/firmware/
+             - espurna/firmware/
      script:
          - . platformio/bin/activate
          - cd espurna/code
