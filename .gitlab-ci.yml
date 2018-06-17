@@ -27,7 +27,7 @@ prepare-build:
         paths:
             - espurna/code/node_modules
             - espurna/code/.piolibdeps
-            - espurna/.platformio
+            - .platformio
     script:
         - . platformio/bin/activate
         - pip install -U platformio
