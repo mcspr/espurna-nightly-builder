@@ -6,18 +6,22 @@ stages:
     - build
 
 
+variables:
+    PLATFORMIO_HOME_DIR: "$CI_PROJECT_DIR/platformio"
+
+
 prepare:platformio:
     stage: prepare
     artifacts:
         expire_in: 1h
         paths:
             - platformio/
+            - venv/
             - espurna/
-            - "~/.platformio/"
     script:
         - python -V
-        - virtualenv ./platformio
-        - . platformio/bin/activate
+        - virtualenv ./venv
+        - . venv/bin/activate
         - pip install -U platformio
         - git clone --depth=1 https://github.com/xoseperez/espurna
         - python2 prepare.py espurna/code
@@ -30,9 +34,7 @@ build:espurna-core-1MB:
          paths:
              - espurna/firmware/
      script:
-         - . platformio/bin/activate
-         - echo $HOME && pwd
-         - ls $HOME/platformio
+         - . venv/bin/activate
          - cd espurna/code && ./build.sh espurna-core-1MB
 
 
@@ -43,7 +45,7 @@ build:espurna-core-4MB:
          paths:
              - espurna/firmware/
      script:
-         - . platformio/bin/activate
+         - . venv/bin/activate
          - cd espurna/code && ./build.sh espurna-core-1MB
      only:
          - tags
