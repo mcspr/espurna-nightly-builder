@@ -50,7 +50,8 @@ def pio_prepare(cwd, libraries, platforms):
     # - run dummy project to test compiler and install tool-scons
     commands = [
             [run(0), ["platformio", "lib", "install"] + libraries],
-            [run(0), ["npm", "install", "--only=dev"]]
+            [run(0), ["npm", "install", "--only=dev"]],
+            [run(0), ["node", "node_modules/gulp/bin/gulp.js"]]
     ]
     for platform in platforms:
         tmpdir = tempfile.mkdtemp()
