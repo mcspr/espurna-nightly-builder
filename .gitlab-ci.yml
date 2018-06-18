@@ -6,17 +6,14 @@ stages:
     - build
 
 
-before_script:
-    - export PLATFORMIO_HOME_DIR=~/platformio/home_dir
-
-
 prepare:platformio:
     stage: prepare
     artifacts:
         expire_in: 1h
         paths:
-            - platformio
-            - espurna
+            - platformio/
+            - espurna/
+            - "~/.platformio/"
     script:
         - python -V
         - virtualenv ./platformio
@@ -29,7 +26,7 @@ prepare:platformio:
 build:espurna-core-1MB:
      stage: build
      artifacts:
-         expire_in: 7d
+         expire_in: 1h
          paths:
              - espurna/firmware/
      script:
