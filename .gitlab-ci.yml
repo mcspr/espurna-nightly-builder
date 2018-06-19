@@ -97,6 +97,13 @@ build:nodemcu-lolin-ssl:
 
 package:release:
     stage: package
+    dependencies:
+        - build:espurna-core-1MB
+        - build:espurna-core-4MB
+        - build:wemos-d1mini-relayshield
+        - build:wemos-d1mini-relayshield-ssl
+        - build:nodemcu-lolin
+        - build:nodemcu-lolin-ssl
     artifacts:
         expire_in: 1h
         paths:
