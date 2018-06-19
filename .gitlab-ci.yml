@@ -110,4 +110,4 @@ package:release:
             - release.tar.xz
     script:
         - find espurna/firmware
-        - tar cf release.tar.xz espurna/firmware/
+        - tar cJf release.tar.xz espurna/firmware/
