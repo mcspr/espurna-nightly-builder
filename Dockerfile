@@ -2,6 +2,13 @@ FROM bitnami/minideb:stretch
 
 ENV DEBIAN_FRONTEND noninteractive
 
+RUN groupadd --gid 1000 worker && \
+    useradd \
+        --uid 1000 \
+        --gid worker \
+        --shell /bin/bash \
+        --create-home worker
+
 RUN install_packages python-minimal libpython2.7-stdlib ca-certificates git wget gnupg apt-transport-https && \
     wget https://bootstrap.pypa.io/get-pip.py && \
     python2.7 get-pip.py && \
@@ -14,5 +21,7 @@ RUN install_packages python-minimal libpython2.7-stdlib ca-certificates git wget
     install_packages nodejs && \
     npm install -g npm && \
     apt-get purge --autoremove -q -y wget gnupg apt-transport-https
+
+USER worker
 
 CMD ["/bin/sh"]
