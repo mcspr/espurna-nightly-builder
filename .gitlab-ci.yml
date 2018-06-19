@@ -27,72 +27,98 @@ prepare:platformio:
         - git clone --depth=1 https://github.com/xoseperez/espurna
         - python2 prepare.py espurna/code
         - sed -i 's/^node.*gulp.*/echo "...not building web interface"/' espurna/code/build.sh
+    only:
+        - tags
 
 
 build:espurna-core-1MB:
-     stage: build
-     artifacts:
-         expire_in: 15m
-         paths:
-             - espurna/firmware/
-     script:
-         - . venv/bin/activate
-         - cd espurna/code && ./build.sh espurna-core-1MB
+    stage: build
+    dependencies:
+        - prepare:platformio
+    artifacts:
+        expire_in: 15m
+        paths:
+            - espurna/firmware/
+    script:
+        - . venv/bin/activate
+        - cd espurna/code && ./build.sh espurna-core-1MB
+    only:
+        - tags
 
 
 build:espurna-core-4MB:
-     stage: build
-     artifacts:
-         expire_in: 15m
-         paths:
-             - espurna/firmware/
-     script:
-         - . venv/bin/activate
-         - cd espurna/code && ./build.sh espurna-core-4MB
+    stage: build
+    dependencies:
+        - prepare:platformio
+    artifacts:
+        expire_in: 15m
+        paths:
+            - espurna/firmware/
+    script:
+        - . venv/bin/activate
+        - cd espurna/code && ./build.sh espurna-core-4MB
+    only:
+        - tags
 
 
 build:wemos-d1mini-relayshield:
-     stage: build
-     artifacts:
-         expire_in: 15m
-         paths:
-             - espurna/firmware/
-     script:
-         - . venv/bin/activate
-         - cd espurna/code && ./build.sh wemos-d1mini-relayshield
+    stage: build
+    dependencies:
+        - prepare:platformio
+    artifacts:
+        expire_in: 15m
+        paths:
+            - espurna/firmware/
+    script:
+        - . venv/bin/activate
+        - cd espurna/code && ./build.sh wemos-d1mini-relayshield
+    only:
+        - tags
 
 
 build:wemos-d1mini-relayshield-ssl:
-     stage: build
-     artifacts:
-         expire_in: 15m
-         paths:
-             - espurna/firmware/
-     script:
-         - . venv/bin/activate
-         - cd espurna/code && ./build.sh wemos-d1mini-relayshield-ssl
+    stage: build
+    dependencies:
+        - prepare:platformio
+    artifacts:
+        expire_in: 15m
+        paths:
+            - espurna/firmware/
+    script:
+        - . venv/bin/activate
+        - cd espurna/code && ./build.sh wemos-d1mini-relayshield-ssl
+    only:
+        - tags
 
 
 build:nodemcu-lolin:
-     stage: build
-     artifacts:
-         expire_in: 15m
-         paths:
-             - espurna/firmware/
-     script:
-         - . venv/bin/activate
-         - cd espurna/code && ./build.sh nodemcu-lolin
+    stage: build
+    dependencies:
+        - prepare:platformio
+    artifacts:
+        expire_in: 15m
+        paths:
+            - espurna/firmware/
+    script:
+        - . venv/bin/activate
+        - cd espurna/code && ./build.sh nodemcu-lolin
+    only:
+        - tags
 
 
 build:nodemcu-lolin-ssl:
-     stage: build
-     artifacts:
-         expire_in: 15m
-         paths:
-             - espurna/firmware/
-     script:
-         - . venv/bin/activate
-         - cd espurna/code && ./build.sh nodemcu-lolin-ssl
+    stage: build
+    dependencies:
+        - prepare:platformio
+    artifacts:
+        expire_in: 15m
+        paths:
+            - espurna/firmware/
+    script:
+        - . venv/bin/activate
+        - cd espurna/code && ./build.sh nodemcu-lolin-ssl
+    only:
+        - tags
 
 
 package:release:
@@ -111,3 +137,5 @@ package:release:
     script:
         - find espurna/firmware
         - tar cJf release.tar.xz espurna/firmware/
+    only:
+        - tags
