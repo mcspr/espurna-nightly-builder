@@ -4,6 +4,7 @@ python:
 - '2.7'
 
 env:
+  - ESPURNA_COMMIT=0c657a4a4a41d2b2ddb0dc36e08511775f284c0f
   - PLATFORMIO_LIBDEPS_DIR="${HOME}/pio-libdeps"
 
 cache:
@@ -14,7 +15,11 @@ cache:
 
 install:
   - pip install -U platformio
-  - rm -rf espurna && git clone --depth=1 https://github.com/xoseperez/espurna
+  - rm -rf espurna && mkdir espurna
+  - cd espurna && git init
+  - git remote add origin https://github.com/xoseperez/espurna
+  - git fetch --depth=1 origin $ESPURNA_COMMIT
+  - git checkout FETCH_HEAD && cd ..
 
 deploy:
   provider: releases
