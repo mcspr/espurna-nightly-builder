@@ -4,6 +4,7 @@ python:
 - '2.7'
 
 env:
+  global:
   - ESPURNA_COMMIT=0c657a4a4a41d2b2ddb0dc36e08511775f284c0f
   - PLATFORMIO_LIBDEPS_DIR="${HOME}/pio-libdeps"
 
