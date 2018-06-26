@@ -9,7 +9,7 @@ RUN groupadd --gid 1000 worker && \
         --shell /bin/bash \
         --create-home worker
 
-RUN install_packages python-minimal libpython2.7-stdlib ca-certificates git wget gnupg apt-transport-https && \
+RUN install_packages python-minimal libpython2.7-stdlib ca-certificates git xz-utils wget gnupg apt-transport-https && \
     wget https://bootstrap.pypa.io/get-pip.py && \
     python2.7 get-pip.py && \
     pip install virtualenv && \
