@@ -2,6 +2,8 @@
 set -e
 pushd espurna/code
 
+echo "!!! :_: !!!"
+
 ENVIRONMENT=${1}
 APP_REVISION=$(git rev-parse --short HEAD)
 APP_VERSION=$(grep APP_VERSION espurna/config/version.h | awk '{print $3}' | sed 's/"//g')
