@@ -19,16 +19,18 @@ cache:
 install:
   - pip install -U platformio
   - mkdir -p espurna/code/node_modules
-  - cd espurna
+  - pushd espurna
   - git init
   - git remote add origin https://github.com/xoseperez/espurna
   - git fetch --depth=1 origin $ESPURNA_COMMIT
   - git checkout FETCH_HEAD
   - |
-    cd code
+    pushd code
     if [ ! -e node_modules/gulp/bin/gulp.js ] ; then
         npm install --only=dev
     fi
+    popd -n
+    popd
 
 deploy:
   provider: releases
