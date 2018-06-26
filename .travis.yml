@@ -10,17 +10,25 @@ env:
 
 cache:
   directories:
+  - ${HOME}/.npm
   - ${HOME}/.cache/pip
   - ${HOME}/.platformio
   - ${HOME}/pio-libdeps
+  - ${HOME}/espurna/code/node_modules
 
 install:
   - pip install -U platformio
-  - rm -rf espurna && mkdir espurna
-  - cd espurna && git init
+  - mkdir -p espurna/code/node_modules
+  - cd espurna
+  - git init
   - git remote add origin https://github.com/xoseperez/espurna
   - git fetch --depth=1 origin $ESPURNA_COMMIT
-  - git checkout FETCH_HEAD && cd ..
+  - git checkout FETCH_HEAD
+  - |
+    cd code
+    if [ ! -e node_modules/gulp/bin/gulp.js ] ; then
+        npm install --only=dev
+    fi
 
 deploy:
   provider: releases
@@ -30,23 +38,24 @@ deploy:
   file: espurna/firmware/**/*
   skip_cleanup: true
   on:
-    repo: mcspr/espurna-travis-test
     branch: builder
+    repo: mcspr/espurna-travis-test
     tags: true
 
-after_script:
-  - rm -rf espurna/firmware/
-  - rm -rf espurna/code/.pioenvs
-
 stages:
+  - name: "test"
+    if: type IN (push, pull_request) AND tag IS NOT present
   - name: "release"
     if: tag IS present
 
 jobs:
-  fast_finish: true
   include:
-  - script: ./build.sh espurna-core-1MB
-    stage: "release"
+  - stage: "test"
+    script: ./build.sh travis01
+  - script: ./build.sh travis02
+  - script: ./build.sh travis03
+  - stage: "release"
+    script: ./build.sh espurna-core-1MB
   - script: ./build.sh espurna-core-4MB
   - script: ./build.sh wemos-d1mini-relayshield
   - script: ./build.sh wemos-d1mini-relayshield-ssl
