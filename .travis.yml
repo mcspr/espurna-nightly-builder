@@ -5,7 +5,7 @@ python:
 
 env:
   global:
-  - ESPURNA_COMMIT=59d4afe6cb87779163ff32ca9f401596a5f0ce50
+  - ESPURNA_COMMIT=e34a21ff824ba7d3d887c128c90bef9b5f2525eb
   - PLATFORMIO_LIBDEPS_DIR="${HOME}/pio-libdeps"
 
 cache:
