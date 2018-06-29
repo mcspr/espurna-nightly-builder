@@ -17,6 +17,7 @@ cache:
   - ${HOME}/espurna/code/node_modules
 
 install:
+  - env | grep TRAVIS
   - pip install -U platformio
   - mkdir -p espurna/code/node_modules
   - pushd espurna
@@ -43,7 +44,7 @@ deploy:
     branch: builder
     repo: mcspr/espurna-travis-test
     tags: false
-    condition: $TRAVIS_EVENT_TYPE = cron
+    condition: $TRAVIS_EVENT_TYPE = Cron
 
 stages:
   - name: "test"
