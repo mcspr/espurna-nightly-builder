@@ -33,6 +33,9 @@ install:
     popd -n
     popd
 
+before_deploy:
+  - export TRAVIS_REPO_SLUG=mcspr/espurna
+
 deploy:
   provider: releases
   api_key:
