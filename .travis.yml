@@ -42,7 +42,8 @@ deploy:
   on:
     branch: builder
     repo: mcspr/espurna-travis-test
-    tags: true
+    tags: false
+    condition: $TRAVIS_EVENT_TYPE = cron
 
 stages:
   - name: "test"
