@@ -55,12 +55,15 @@ stages:
   - name: "release"
     if: tag IS present
 
+script: ./build.sh $TRAVIS_ENV
+
 jobs:
   include:
   - stage: "test"
-    script: ./build.sh travis01
-  - script: ./build.sh travis02
-  - script: ./build.sh travis03
+    env:
+    - TRAVIS_ENV=travis01
+    - TRAVIS_ENV=travis02
+    - TRAVIS_ENV=travis03
   - stage: "release"
     script: ./build.sh espurna-core-1MB
   - script: ./build.sh espurna-core-4MB
