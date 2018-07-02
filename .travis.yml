@@ -28,6 +28,7 @@ install:
   - git checkout FETCH_HEAD
   - |
     pushd code
+    sed -i 's/environments=$travis/environments=$available/' build.sh
     if [ ! -e node_modules/gulp/bin/gulp.js ] ; then
         npm install --only=dev
     fi
