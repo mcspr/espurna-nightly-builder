@@ -53,9 +53,9 @@ deploy:
     condition: $TRAVIS_EVENT_TYPE = push
 
 stages:
-  - name: "test"
+  - name: "Test"
     if: type IN (push, pull_request) AND tag IS NOT present
-  - name: "release"
+  - name: "Release"
     if: tag IS present
 
 script:
