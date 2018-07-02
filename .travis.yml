@@ -7,6 +7,7 @@ env:
   global:
   - ESPURNA_COMMIT=e34a21ff824ba7d3d887c128c90bef9b5f2525eb
   - PLATFORMIO_LIBDEPS_DIR="${HOME}/pio-libdeps"
+  - BUILDER_TOTAL_THREADS=4
 
 cache:
   directories:
@@ -33,8 +34,9 @@ install:
     popd -n
     popd
 
-before_deploy:
-  - export TRAVIS_REPO_SLUG=mcspr/espurna
+# XXX override deploy target repo XXX
+#before_deploy:
+#  - export TRAVIS_REPO_SLUG=mcspr/espurna
 
 deploy:
   provider: releases
@@ -46,8 +48,8 @@ deploy:
   on:
     branch: builder
     repo: mcspr/espurna-travis-test
-    tags: false
-    condition: $TRAVIS_EVENT_TYPE = cron
+    tags: true
+    condition: $TRAVIS_EVENT_TYPE = push
 
 stages:
   - name: "test"
@@ -55,104 +57,17 @@ stages:
   - name: "release"
     if: tag IS present
 
-script: ./build.sh $TRAVIS_ENV
+script:
+  - cd espurna/code && bash build.sh -p
 
 jobs:
   include:
-  - stage: "test"
-    env:
-    - TRAVIS_ENV=travis01
-    - TRAVIS_ENV=travis02
-    - TRAVIS_ENV=travis03
-  - stage: "release"
-    script: ./build.sh espurna-core-1MB
-  - script: ./build.sh espurna-core-4MB
-  - script: ./build.sh wemos-d1mini-relayshield
-  - script: ./build.sh wemos-d1mini-relayshield-ssl
-  - script: ./build.sh nodemcu-lolin
-  - script: ./build.sh nodemcu-lolin-ssl
-  - script: ./build.sh tinkerman-espurna-h06
-  - script: ./build.sh tinkerman-espurna-h08
-  - script: ./build.sh tinkerman-espurna-switch
-  - script: ./build.sh wemos-d1-tarpunashield
-  - script: ./build.sh itead-sonoff-basic
-  - script: ./build.sh itead-sonoff-basic-dht
-  - script: ./build.sh itead-sonoff-basic-dallas
-  - script: ./build.sh itead-sonoff-rf
-  - script: ./build.sh itead-sonoff-th
-  - script: ./build.sh itead-sonoff-pow
-  - script: ./build.sh itead-sonoff-pow-r2
-  - script: ./build.sh itead-sonoff-dual
-  - script: ./build.sh itead-sonoff-dual-r2
-  - script: ./build.sh itead-sonoff-dual-ota-r2
-  - script: ./build.sh itead-sonoff-4ch
-  - script: ./build.sh itead-sonoff-4ch-pro
-  - script: ./build.sh itead-sonoff-touch
-  - script: ./build.sh itead-sonoff-b1
-  - script: ./build.sh itead-sonoff-t1-1ch
-  - script: ./build.sh itead-sonoff-t1-2ch
-  - script: ./build.sh itead-sonoff-t1-3ch
-  - script: ./build.sh itead-sonoff-led
-  - script: ./build.sh itead-sonoff-rfbridge
-  - script: ./build.sh itead-sonoff-rfbridge-direct
-  - script: ./build.sh itead-slampher
-  - script: ./build.sh itead-s20
-  - script: ./build.sh itead-1ch-inching
-  - script: ./build.sh itead-motor
-  - script: ./build.sh itead-sonoff-sv
-  - script: ./build.sh itead-sonoff-s31
-  - script: ./build.sh electrodragon-wifi-iot
-  - script: ./build.sh workchoice-ecoplug
-  - script: ./build.sh jangoe-wifi-relay-nc
-  - script: ./build.sh jangoe-wifi-relay-no
-  - script: ./build.sh openenergymonitor-mqtt-relay
-  - script: ./build.sh jorgegarcia-wifi-relays
-  - script: ./build.sh aithinker-ai-light
-  - script: ./build.sh magichome-led-controller
-  - script: ./build.sh magichome-led-controller-20
-  - script: ./build.sh huacanxing-h801
-  - script: ./build.sh huacanxing-h802
-  - script: ./build.sh arilux-al-lc01
-  - script: ./build.sh arilux-al-lc02
-  - script: ./build.sh arilux-al-lc06
-  - script: ./build.sh arilux-al-lc11
-  - script: ./build.sh arilux-e27
-  - script: ./build.sh itead-bnsz01
-  - script: ./build.sh wion-50055
-  - script: ./build.sh exs-wifi-relay-v31
-  - script: ./build.sh wemos-v9261f
-  - script: ./build.sh esp01-v9261f
-  - script: ./build.sh wemos-ech1560
-  - script: ./build.sh esp01-ech1560
-  - script: ./build.sh mancavemade-esplive
-  - script: ./build.sh intermittech-quinled
-  - script: ./build.sh xenon-sm-pw702u
-  - script: ./build.sh authometion-lyt8266
-  - script: ./build.sh kmc-70011
-  - script: ./build.sh yjzk-switch-2ch
-  - script: ./build.sh generic-8ch
-  - script: ./build.sh gizwits-witty-cloud
-  - script: ./build.sh euromate-wifi-stecker-shuko
-  - script: ./build.sh tonbux-powerstrip02
-  - script: ./build.sh lingan-swa1
-  - script: ./build.sh stm-relay
-  - script: ./build.sh heygo-hy02
-  - script: ./build.sh maxcio-wus002s
-  - script: ./build.sh yidian-xsssa05
-  - script: ./build.sh tonbux-xsssa06
-  - script: ./build.sh green-esp8266relay
-  - script: ./build.sh ike-espike
-  - script: ./build.sh arniex-swifitch
-  - script: ./build.sh zhilde-eu44-w
-  - script: ./build.sh luani-hvio
-  - script: ./build.sh neo-coolcam-power-plug-wifi
-  - script: ./build.sh estink-wifi-power-strip
-  - script: ./build.sh generic-esp01s-relay-40
-  - script: ./build.sh generic-esp01s-rgbled-10
-  - script: ./build.sh generic-esp01s-dht11-10
-  - script: ./build.sh generic-esp01s-ds18b20-10
-  - script: ./build.sh heltec-touch-relay
-  - script: ./build.sh allnet-4duino-iot-wlan-relais
-  - script: ./build.sh tonbux-mosquito-killer
-  - script: ./build.sh pilotak-esp-din-v1
-  - script: ./build.sh nodemcu-geiger
+  - stage: "Test"
+    script: cd espurna/code && bash build.sh travis01
+  - script: cd espurna/code && bash build.sh travis02
+  - script: cd espurna/code && bash build.sh travis03
+  - stage: "Release"
+    env: BUILDER_THREAD=0
+  - env: BUILDER_THREAD=1
+  - env: BUILDER_THREAD=2
+  - env: BUILDER_THREAD=3
