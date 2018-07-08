@@ -27,7 +27,7 @@ install:
   - |
     pip install -U requests
     python prepare_env.py && cat environment && source environment
-    [[ ${ESPURNA_DO_RELEASE} = "False" ]] && exit
+    [[ ${ESPURNA_DO_RELEASE} = "True" ]] || exit
   - |
     pushd espurna
     git fetch --depth=1 origin $ESPURNA_COMMIT
@@ -67,7 +67,7 @@ deploy:
 
 stages:
   - name: "Test"
-    if: type = push AND tag IS NOT present
+    if: (type = push) AND (tag IS NOT present)
   - name: "Release"
     if: type = cron
 
