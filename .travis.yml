@@ -19,6 +19,7 @@ cache:
 install:
   - env | grep TRAVIS
   - |
+    mkdir -p espurna
     pushd espurna
     git init
     git remote add origin https://github.com/xoseperez/espurna
