@@ -68,7 +68,7 @@ deploy:
 
 stages:
   - name: "Test"
-    if: type IN (push, pull_request)
+    if: type = push
   - name: "Release"
     if: type = cron
 
@@ -78,9 +78,10 @@ script:
 jobs:
   include:
   - stage: "Test"
-    script: cd espurna/code && bash build.sh travis01
-  - script: cd espurna/code && bash build.sh travis02
-  - script: cd espurna/code && bash build.sh travis03
+    script:
+      - echo ${ESPURNA_COMMIT}
+      - echo ${ESPURNA_RELEASE_BODY}
+      - echo ${ESPURNA_DO_RELEASE}
   - stage: "Release"
     env: BUILDER_THREAD=0
   - env: BUILDER_THREAD=1
