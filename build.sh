@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -e -o pipefail
 pushd espurna/code
 
 # Reuse parallel build implementation from https://github.com/xoseperez/espurna/pull/986 (kudos to @lobradov)
