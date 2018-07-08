@@ -36,7 +36,7 @@ install:
     git checkout FETCH_HEAD
     popd
   - |
-    pushd esurna/code
+    pushd espurna/code
     pip install -U platformio
     mkdir -p node_modules
     if [ ! -e node_modules/gulp/bin/gulp.js ] ; then
