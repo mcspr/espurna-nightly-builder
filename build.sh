@@ -31,6 +31,7 @@ for environment in $environments ; do
     echo "> $environment"
     time platformio run -s -e $environment
     cp .pioenvs/$environment/firmware.bin ${OUTPUT_DIR}/espurna-${APP_VERSION}.git${APP_REVISION}-${environment}.bin
+    break
 done
 
 popd
