@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import json
 import time
 import sys
 import subprocess
@@ -26,12 +27,38 @@ def get_heads(branches, cwd="espurna"):
     return commits
 
 
-def get_latest_release_body(endpoint="https://api.github.com/repos/mcspr/espurna-travis-test/releases/latest"):
-    data = requests.get(endpoint).json()
+def get_latest_release_description(token, endpoint="https://api.github.com/graphql"):
+    query = """
+    query {
+        repository(owner:\"mcspr\", name:\"espurna-travis-test\") {
+            releases(last:1) {
+                nodes {
+                    publishedAt
+                    description
+                    resourcePath
+                }
+            }
+        }
+    }""".strip()
+    query = json.dumps({"query": query})
+
+    headers = {
+        "Authorization": "token {}".format(token),
+        "User-Agent": "mcspr/espurna-travis-test/builder-v1.0"
+    }
+
+    result = requests.post(endpoint,headers=headers, data=query)
+    result = result.json()
+
+    (release, ) = result["data"]["repository"]["releases"]["nodes"]
+
+    url = "https://github.com{}".format(release["resourcePath"])
+
     print("> Latest release:")
-    print("html_url: {}".format(data["html_url"]))
-    print("api_url: {}".format(data["url"]))
-    return data["body"]
+    print("url: {}".format(url))
+    print("date: {}".format(release["publishedAt"]))
+
+    return release["description"]
 
 
 def write_env_and_exit(commit, do_release, filename="environment"):
@@ -50,12 +77,12 @@ if __name__ == "__main__":
         # Skip official build
         write_env_and_exit(None, False)
 
-    release_body = get_latest_release_body()
-    if not release_body:
+    release_desc = get_latest_release_description(os.environ["GH_AUTHORIZATION"])
+    if not release_desc:
         # Something is wrong with this builder?
         write_env_and_exit(None, False)
 
-    release_commit = release_body.split("/")[-1]
+    release_commit = release_desc.split("/")[-1]
     if commits["dev"] == release_commit:
         # Skipping already released commit
         write_env_and_exit(None, False)

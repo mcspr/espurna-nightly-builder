@@ -53,8 +53,7 @@ before_deploy:
 
 deploy:
   provider: releases
-  api_key:
-    secure: Plq6C7sY/OBNp9OEszlsRKr1A6ezmYNiFHoxb6QN0rs96BEBjRKDfa9yGQus2O+42zxnPgcGWBPVUQ20hY1NQ1/+YFjrXabmAKqfSV1lTUuy2XOh2UQBE2wwiRfK2Ej4qmecMvqsaKEVEtCgcWU4Ozm/sfTZYBCpkeUcqWKZTzulKKE4Z+R8mE/CgbbyS+E3SxCoydKeSclg9WKzjPy8K6MHvi/rsvjmbEMq81QItfcVeRteclV7mYPCmshxQPNKH9bZ9kQmwrWX2GzS6H9fKwu+o1LdvpVE3GEmWl1iWpGzmnakWUMa7y4+IWM0YTG83Zmqd18CUqiuDdhtho5MXR/iY9HpM1FsQ4fYXeGEtlHwzT4TvX3B6brI34v1ycwbvE7QUFy5GWRNJOZNuuG/ym5YnctMCsIw263kTds6zL7cWV90/WJsoTEpicMdcCmECCHmnliz08QgdnO78mjJ3+Z/tuued6jfpRSiReNAbsXmI+vy+w9x84824O1kmZWmI1mhizIUmsV48Jz3rsMXGnxhCHrzJLduKYEwD24ngLikZKhCMNyNoRYTYpcnF33v/Bz+sqI7QhkU6/onNEoLyL/i6wQF10hkOZ9NBS13hK71svHHX24rmIC6N6OFxO9NYgwgy8poMWuZHxTJOWwe8YR2GcY9ChnEQLeY8cZf2rM=
+  api_key: ${GH_AUTHORIZATION}
   file_glob: true
   file: espurna/firmware/**/*
   skip_cleanup: true
