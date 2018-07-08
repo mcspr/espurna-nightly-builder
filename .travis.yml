@@ -87,3 +87,6 @@ jobs:
   - env: BUILDER_THREAD=1
   - env: BUILDER_THREAD=2
   - env: BUILDER_THREAD=3
+
+notifications:
+  email: false
