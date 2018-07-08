@@ -62,12 +62,10 @@ deploy:
   on:
     branch: builder
     repo: mcspr/espurna-travis-test
-    tags: false
-    condition: $TRAVIS_EVENT_TYPE = cron
+    condition: $TRAVIS_BUILD_STAGE_NAME = Release
 
 stages:
   - name: "Test"
-    if: (type = push) AND (tag IS NOT present)
   - name: "Release"
     if: type = cron
 
