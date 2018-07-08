@@ -69,7 +69,7 @@ deploy:
 
 stages:
   - name: "Test"
-    if: type = push
+    if: type = push AND tag IS NOT present
   - name: "Release"
     if: type = cron
 
