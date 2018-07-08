@@ -77,10 +77,7 @@ script:
 jobs:
   include:
   - stage: "Test"
-    script:
-      - echo ${ESPURNA_COMMIT}
-      - echo ${ESPURNA_RELEASE_BODY}
-      - echo ${ESPURNA_DO_RELEASE}
+    script: true
   - stage: "Release"
     env: BUILDER_THREAD=0
   - env: BUILDER_THREAD=1
