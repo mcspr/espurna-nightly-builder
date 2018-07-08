@@ -74,7 +74,7 @@ stages:
     if: type = cron
 
 script:
-  - bash build.sh -p
+  - bash build.sh
 
 jobs:
   include:

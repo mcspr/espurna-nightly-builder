@@ -25,10 +25,13 @@ APP_VERSION=$(grep APP_VERSION espurna/config/version.h | awk '{print $3}' | sed
 OUTPUT_DIR="../firmware/espurna-${APP_VERSION}"
 
 time node node_modules/gulp/bin/gulp.js
-time platformio run -s -e ${ENVIRONMENT}
 
 mkdir -p ${OUTPUT_DIR}
-cp .pioenvs/${1}/firmware.bin ${OUTPUT_DIR}/espurna-${APP_VERSION}.git${APP_REVISION}-${ENVIRONMENT}.bin
+for environment in $environments ; do
+    echo "> $environment"
+    time platformio run -s -e $environment
+    cp .pioenvs/$environment/firmware.bin ${OUTPUT_DIR}/espurna-${APP_VERSION}.git${APP_REVISION}-${environment}.bin
+done
 
 popd
 
