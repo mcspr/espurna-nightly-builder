@@ -59,7 +59,7 @@ stages:
     if: tag IS present
 
 script:
-  - cd espurna/code && bash build.sh -p && cd $TRAVIS_BUILD_DIR
+  - bash build.sh -p
 
 jobs:
   include:
