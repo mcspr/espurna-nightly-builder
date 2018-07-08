@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import time
 import sys
 import subprocess
 
@@ -27,6 +28,9 @@ def get_heads(branches, cwd="espurna"):
 
 def get_latest_release_body(endpoint="https://api.github.com/repos/mcspr/espurna-travis-test/releases/latest"):
     data = requests.get(endpoint).json()
+    print("> Latest release:")
+    print("html_url: {}".format(data["html_url"]))
+    print("api_url: {}".format(data["url"]))
     return data["body"]
 
 
@@ -34,8 +38,11 @@ def write_env_and_exit(commit, do_release, filename="environment"):
     with open(filename, "w") as env:
         if commit:
             env.write("export ESPURNA_COMMIT={}\n".format(commit))
+            env.write("export ESPURNA_RELEASE_TAG={}\n".format(time.strftime("%Y%m%d")))
+            env.write("export ESPURNA_RELEASE_BODY=\"https://github.com/xoseperez/espurna/commit/{}\"\n".format(commit))
         env.write("export ESPURNA_DO_RELEASE={}\n".format(do_release))
     sys.exit(0)
+
 
 if __name__ == "__main__":
     commits = get_heads(["dev", "master"])

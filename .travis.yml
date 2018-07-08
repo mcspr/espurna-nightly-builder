@@ -26,10 +26,8 @@ install:
     popd
   - |
     pip install -U requests
-    python prepare_env.py
-    source environment
+    python prepare_env.py && cat environment && source environment
     [[ ${ESPURNA_DO_RELEASE} = "False" ]] && exit
-    export ESPURNA_RELEASE_BODY="https://github.com/xoseperez/espurna/commit/${ESPURNA_COMMIT}"
   - |
     pushd espurna
     git fetch --depth=1 origin $ESPURNA_COMMIT
@@ -51,7 +49,7 @@ install:
 before_deploy:
     - git config --local user.name "espurna-travis-test"
     - git config --local user.email "prokhorov.max@outlook.com"
-    - git tag "$(date -u +%Y%m%d)-pre"
+    - git tag "${ESPURNA_RELEASE_TAG}"
 
 deploy:
   provider: releases
