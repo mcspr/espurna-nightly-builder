@@ -51,7 +51,7 @@ install:
 before_deploy:
     - git config --local user.name "espurna-travis-test"
     - git config --local user.email "prokhorov.max@outlook.com"
-    - git tag $(date -u +%Y%m%d)
+    - git tag "$(date -u +%Y%m%d)-pre"
 
 deploy:
   provider: releases
