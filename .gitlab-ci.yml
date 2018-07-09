@@ -6,8 +6,25 @@ stages:
     - package
 
 variables:
+    DOCKER_DRIVER: "overlay2"
     PLATFORMIO_HOME_DIR: "$CI_PROJECT_DIR/platformio"
     BUILDER_TOTAL_THREADS: 4
+
+prepare:test:
+    stage: prepare
+    artifacts:
+        expire_in: 10m
+        paths:
+            - espurna/firmware/
+    script:
+        - python -V
+        - virtualenv ./venv && source venv/bin/activate && pip install platformio
+        - git clone --depth=1 https://github.com/xoseperez/espurna
+        - cd espurna/code
+        - platformio run -e itead-sonoff-basic
+        - platformio run -e itead-sonoff-pow
+    only:
+        - web
 
 prepare:platformio:
     stage: prepare
