@@ -27,7 +27,7 @@ prepare:platformio:
         - pip install -U requests
         - python2 prepare_env.py && cat environment && source environment
         - pushd espurna && git fetch --depth=1 origin refs/heads/dev && git checkout FETCH_HEAD && popd
-        - [[ ${ESPURNA_DO_RELEASE} = "True" ]] || exit 10
+        - "[[ ${ESPURNA_DO_RELEASE} = \"True\" ]] || exit 10"
         - pip install -U platformio
         - python2 prepare.py espurna/code
     only:
