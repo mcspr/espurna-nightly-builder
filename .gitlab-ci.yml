@@ -83,6 +83,6 @@ package:release:
         - tar cJf release.tar.xz espurna/firmware/
         - source environment
         - cd espurna/firmware/*
-        - ghr -r mcspr/espurna-travis-test -b ${ESPURNA_RELEASE_BODY} ${ESPURNA_RELEASE_TAG} ./
+        - ghr -u mcspr -r espurna-travis-test -b ${ESPURNA_RELEASE_BODY} ${ESPURNA_RELEASE_TAG} ./
     only:
         - schedules
