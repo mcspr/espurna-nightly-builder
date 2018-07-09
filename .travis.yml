@@ -54,7 +54,7 @@ before_deploy:
 
 deploy:
   provider: releases
-  api_key: ${GH_AUTHORIZATION}
+  api_key: ${GITHUB_TOKEN}
   file_glob: true
   file: espurna/firmware/**/*
   skip_cleanup: true

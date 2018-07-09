@@ -82,7 +82,7 @@ if __name__ == "__main__":
         # Skip official build
         write_env_and_exit(None, False)
 
-    release_desc = get_latest_release_description(os.environ["GH_AUTHORIZATION"])
+    release_desc = get_latest_release_description(os.environ["GITHUB_TOKEN"])
     if not release_desc:
         # Something is wrong with this builder?
         write_env_and_exit(None, False)
