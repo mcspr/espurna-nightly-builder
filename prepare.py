@@ -15,6 +15,10 @@ import tempfile
 INO = "void setup(){}\nvoid loop(){}\n"
 
 
+def c_print(msg):
+    print('\x1b[1;32m{}\x1b[0m'.format(msg))
+
+
 def get_pio_libraries(cwd, platformio_ini="platformio.ini"):
     path = os.path.join(cwd, platformio_ini)
 
@@ -32,6 +36,7 @@ def pio_prepare(cwd, libraries, platforms):
             code = 1
 
             try:
+                c_print("Running: {}".format(' '.join(cmd)))
                 code = subprocess.call(cmd, cwd=cwd)
             except OSError as e:
                 print(e, ' '.join(cmd))
@@ -95,12 +100,10 @@ if __name__ == "__main__":
     base = os.path.join(root, rel_path)
     libs = get_pio_libraries(cwd=base)
 
-    print("preparing dependencies ...")
+    c_print(">>> Preparing dependencies <<<")
     if not pio_prepare(
         cwd=base,
         libraries=libs,
         platforms=("espressif8266@1.5.0", "espressif8266@1.7.3"),
     ):
         sys.exit(1)
-
-    print("prepared dependencies")

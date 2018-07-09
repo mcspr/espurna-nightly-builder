@@ -13,6 +13,10 @@ except ImportError:
 import requests
 
 
+def c_print(msg):
+    print('\x1b[1;32m{}\x1b[0m'.format(msg))
+
+
 def get_heads(branches, cwd="espurna"):
     cmd = ["git", "ls-remote", "--heads", "origin"]
     for branch in branches:
@@ -59,9 +63,9 @@ def get_latest_release_description(token, endpoint="https://api.github.com/graph
 
     url = urljoin("https://github.com", release["resourcePath"])
 
-    print("> Latest release:")
-    print("url: {}".format(url))
-    print("date: {}".format(release["publishedAt"]))
+    c_print(">>> Latest release <<<")
+    c_print("url: {}".format(url))
+    c_print("date: {}".format(release["publishedAt"]))
 
     return release["description"]
 
@@ -79,17 +83,17 @@ def write_env_and_exit(commit, do_release, filename="environment"):
 if __name__ == "__main__":
     commits = get_heads(["dev", "master"])
     if commits["dev"] == commits["master"]:
-        # Skip official build
+        c_print("Skipping normal release")
         write_env_and_exit(None, False)
 
     release_desc = get_latest_release_description(os.environ["GITHUB_TOKEN"])
     if not release_desc:
-        # Something is wrong with this builder?
+        c_print("No release description on previous build")
         write_env_and_exit(None, False)
 
     release_commit = release_desc.split("/")[-1]
     if commits["dev"] == release_commit:
-        # Skipping already released commit
+        c_print("Skipping already released commit")
         write_env_and_exit(None, False)
 
     write_env_and_exit(commits["dev"], True)

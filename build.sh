@@ -2,16 +2,24 @@
 set -e -o pipefail
 pushd espurna/code
 
+# Nice logging
+g_echo() {
+    local c_start='\033[1;32m'
+    local c_end='\033[0m'
+    shift
+    echo "${c_start}$*${c_end}"
+}
+
 # Reuse parallel build implementation from https://github.com/xoseperez/espurna/pull/986 (kudos to @lobradov)
 par_thread=${BUILDER_THREAD:-0}
 par_total_threads=${BUILDER_TOTAL_THREADS:-4}
 if [ ${par_thread} -ne ${par_thread} -o \
     ${par_total_threads} -ne ${par_total_threads} ]; then
-    echo "Parallel threads should be a number."
+    g_echo "Parallel threads should be a number."
     exit
 fi
 if [ ${par_thread} -ge ${par_total_threads} ]; then
-    echo "Current thread is greater than total threads. Doesn't make sense"
+    g_echo "Current thread is greater than total threads. Doesn't make sense"
     exit
 fi
 
@@ -28,11 +36,10 @@ OUTPUT_DIR="../firmware/espurna-${APP_VERSION}"
 
 mkdir -p ${OUTPUT_DIR}
 for environment in $environments ; do
-    echo "> $environment"
+    g_echo " * $environment"
     time platformio run -s -e $environment
     cp .pioenvs/$environment/firmware.bin ${OUTPUT_DIR}/espurna-${APP_VERSION}.git${APP_REVISION}-${environment}.bin
     break
 done
 
 popd
-
