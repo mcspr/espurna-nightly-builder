@@ -1,15 +1,13 @@
 image: registry.gitlab.com/mcspr/espurna-travis-test:latest
 
-
 stages:
     - prepare
     - build
     - package
 
-
 variables:
     PLATFORMIO_HOME_DIR: "$CI_PROJECT_DIR/platformio"
-
+    BUILDER_TOTAL_THREADS: 4
 
 prepare:platformio:
     stage: prepare
@@ -19,19 +17,23 @@ prepare:platformio:
             - platformio/
             - venv/
             - espurna/
+            - environment
     script:
         - python -V
         - virtualenv ./venv
         - . venv/bin/activate
+        - mkdir -p espurna
+        - pushd espurna && git init && git remote add origin https://github.com/xoseperez/espurna && popd
+        - pip install -U requests
+        - python2 prepare_env.py && cat environment && source environment
+        - pushd espurna && git fetch --depth=1 origin refs/heads/dev && git checkout FETCH_HEAD && popd
+        - [[ ${ESPURNA_DO_RELEASE} = "True" ]] || exit 10
         - pip install -U platformio
-        - git clone --depth=1 https://github.com/xoseperez/espurna
         - python2 prepare.py espurna/code
-        - sed -i 's/^node.*gulp.*/echo "...not building web interface"/' espurna/code/build.sh
     only:
-        - tags
+        - schedules
 
-
-build:espurna-core-1MB:
+build:template: &build_template
     stage: build
     dependencies:
         - prepare:platformio
@@ -41,101 +43,45 @@ build:espurna-core-1MB:
             - espurna/firmware/
     script:
         - . venv/bin/activate
-        - cd espurna/code && ./build.sh espurna-core-1MB
+        - ./build.sh
     only:
-        - tags
+        - schedules
 
+build:builder_0:
+    variables:
+        BUILDER_THREAD: 0
+    <<: *build_template
 
-build:espurna-core-4MB:
-    stage: build
-    dependencies:
-        - prepare:platformio
-    artifacts:
-        expire_in: 15m
-        paths:
-            - espurna/firmware/
-    script:
-        - . venv/bin/activate
-        - cd espurna/code && ./build.sh espurna-core-4MB
-    only:
-        - tags
+build:builder_1:
+    variables:
+        BUILDER_THREAD: 1
+    <<: *build_template
 
+build:builder_2:
+    variables:
+        BUILDER_THREAD: 2
+    <<: *build_template
 
-build:wemos-d1mini-relayshield:
-    stage: build
-    dependencies:
-        - prepare:platformio
-    artifacts:
-        expire_in: 15m
-        paths:
-            - espurna/firmware/
-    script:
-        - . venv/bin/activate
-        - cd espurna/code && ./build.sh wemos-d1mini-relayshield
-    only:
-        - tags
-
-
-build:wemos-d1mini-relayshield-ssl:
-    stage: build
-    dependencies:
-        - prepare:platformio
-    artifacts:
-        expire_in: 15m
-        paths:
-            - espurna/firmware/
-    script:
-        - . venv/bin/activate
-        - cd espurna/code && ./build.sh wemos-d1mini-relayshield-ssl
-    only:
-        - tags
-
-
-build:nodemcu-lolin:
-    stage: build
-    dependencies:
-        - prepare:platformio
-    artifacts:
-        expire_in: 15m
-        paths:
-            - espurna/firmware/
-    script:
-        - . venv/bin/activate
-        - cd espurna/code && ./build.sh nodemcu-lolin
-    only:
-        - tags
-
-
-build:nodemcu-lolin-ssl:
-    stage: build
-    dependencies:
-        - prepare:platformio
-    artifacts:
-        expire_in: 15m
-        paths:
-            - espurna/firmware/
-    script:
-        - . venv/bin/activate
-        - cd espurna/code && ./build.sh nodemcu-lolin-ssl
-    only:
-        - tags
-
+build:builder_3:
+    variables:
+        BUILDER_THREAD: 3
+    <<: *build_template
 
 package:release:
     stage: package
     dependencies:
-        - build:espurna-core-1MB
-        - build:espurna-core-4MB
-        - build:wemos-d1mini-relayshield
-        - build:wemos-d1mini-relayshield-ssl
-        - build:nodemcu-lolin
-        - build:nodemcu-lolin-ssl
+        - build:builder_0
+        - build:builder_1
+        - build:builder_2
+        - build:builder_3
     artifacts:
         expire_in: 1h
         paths:
             - release.tar.xz
     script:
-        - find espurna/firmware
         - tar cJf release.tar.xz espurna/firmware/
+        - source environment
+        - cd espurna/firmware/*
+        - ghr -r mcspr/espurna-travis-test -b ${ESPURNA_RELEASE_BODY} ${ESPURNA_RELEASE_TAG} ./
     only:
-        - tags
+        - schedules
