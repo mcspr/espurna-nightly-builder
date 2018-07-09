@@ -22,8 +22,8 @@ prepare:test:
         - virtualenv venv && source venv/bin/activate
         - pip install platformio
         - git clone --depth=1 https://github.com/xoseperez/espurna
-        - python pio-2cpu run -d espurna/code -e itead-sonoff-basic
-        - python pio-2cpu run -d espurna/code -e itead-sonoff-pow
+        - pio run -d espurna/code -e itead-sonoff-basic
+        - pio run -d espurna/code -e itead-sonoff-pow
     only:
         - web
 

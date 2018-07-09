@@ -1,9 +1,0 @@
-import sys
-
-import platformio.managers.platform
-platformio.managers.platform.cpu_count = lambda: 2
-
-from platformio.__main__ import main
-
-if __name__ == '__main__':
-    sys.exit(main())
