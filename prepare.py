@@ -86,7 +86,7 @@ def pio_prepare(cwd, libraries, platforms):
 
 
 if __name__ == "__main__":
-    root = os.environ.get("TRAVIS_BUILD_DIR")
+    root = os.environ.get("CI_PROJECT_DIR")
     if not root:
         root = os.getcwd()
 
@@ -99,7 +99,7 @@ if __name__ == "__main__":
     if not pio_prepare(
         cwd=base,
         libraries=libs,
-        platforms=("espressif8266@1.5.0", "espressif8266@1.6.0"),
+        platforms=("espressif8266@1.5.0", "espressif8266@1.7.3"),
     ):
         sys.exit(1)
 
