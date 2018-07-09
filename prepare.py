@@ -49,7 +49,7 @@ def pio_prepare(cwd, libraries, platforms):
     # - explicitly install required libraries so each job has lib dependencies ready
     # - run dummy project to test compiler and install tool-scons
     commands = [
-            [run(0), ["platformio", "lib", "install"] + libraries],
+            [run(0), ["platformio", "lib", "install", "-s"] + libraries],
             [run(0), ["npm", "install", "--only=dev"]],
             [run(0), ["node", "node_modules/gulp/bin/gulp.js"]]
     ]
@@ -73,7 +73,7 @@ def pio_prepare(cwd, libraries, platforms):
                         "-O", "platform={}".format(platform),
                     ],
                 ],
-                [run(0), ["platformio", "run", "-d", tmpdir]],
+                [run(0), ["platformio", "run", "-s", "-d", tmpdir]],
                 [after(tmpdir), None]
             ]
         )
