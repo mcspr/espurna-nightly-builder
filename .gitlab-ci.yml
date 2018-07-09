@@ -18,7 +18,7 @@ prepare:test:
             - espurna/firmware/
     script:
         - python -V
-            - cat /proc/cpuinfo
+        - cat /proc/cpuinfo
         - virtualenv venv && source venv/bin/activate
         - pip install platformio
         - git clone --depth=1 https://github.com/xoseperez/espurna
