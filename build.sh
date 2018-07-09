@@ -6,8 +6,7 @@ pushd espurna/code
 g_echo() {
     local c_start='\033[1;32m'
     local c_end='\033[0m'
-    shift
-    echo "${c_start}$*${c_end}"
+    echo -e "${c_start}"${*}"${c_end}"
 }
 
 # Reuse parallel build implementation from https://github.com/xoseperez/espurna/pull/986 (kudos to @lobradov)
