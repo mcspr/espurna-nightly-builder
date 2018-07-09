@@ -49,23 +49,27 @@ prepare:platformio:
         - schedules
 
 build:builder_0:
-    variables:
-        BUILDER_THREAD: 0
+    before_script:
+        - export BUILDER_TOTAL_THREADS=$BUILDER_TOTAL_THREADS
+        - export BUILDER_THREAD=0
     <<: *build_template
 
 build:builder_1:
-    variables:
-        BUILDER_THREAD: 1
+    before_script:
+        - export BUILDER_TOTAL_THREADS=$BUILDER_TOTAL_THREADS
+        - export BUILDER_THREAD=1
     <<: *build_template
 
 build:builder_2:
-    variables:
-        BUILDER_THREAD: 2
+    before_script:
+        - export BUILDER_TOTAL_THREADS=$BUILDER_TOTAL_THREADS
+        - export BUILDER_THREAD=2
     <<: *build_template
 
 build:builder_3:
-    variables:
-        BUILDER_THREAD: 3
+    before_script:
+        - export BUILDER_TOTAL_THREADS=$BUILDER_TOTAL_THREADS
+        - export BUILDER_THREAD=3
     <<: *build_template
 
 package:release:
