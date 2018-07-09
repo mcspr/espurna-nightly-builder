@@ -1,10 +1,20 @@
-FROM bitnami/minideb:stretch as goodies
+FROM bitnami/minideb:stretch as installer
+
+FROM debian:buster-slim as ghr
+
+COPY --from=installer /usr/sbin/install_packages /usr/sbin/install_packages
+RUN install_packages git wget ca-certificates g++ gcc libc6-dev make pkg-config && \
+    wget -O go.tgz "https://golang.org/dl/go1.10.3.linux-amd64.tar.gz" && \
+    tar -C /usr/local -xzf go.tgz && \
+    mkdir -p /go/src /go/bin && chmod -R 777 /go && \
+    GOPATH=/go /usr/local/go/bin/go get -u github.com/tcnksm/ghr
 
 FROM debian:buster-slim
 
-COPY --from=0 /usr/sbin/install_packages /usr/sbin/install_packages
-
 ENV DEBIAN_FRONTEND noninteractive
+
+COPY --from=ghr /go/bin/ghr /usr/sbin/ghr
+COPY --from=installer /usr/sbin/install_packages /usr/sbin/install_packages
 
 RUN groupadd --gid 1000 worker && \
     useradd \
