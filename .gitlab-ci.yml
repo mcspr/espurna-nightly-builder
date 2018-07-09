@@ -40,6 +40,7 @@ prepare:platformio:
     artifacts:
         expire_in: 15m
         paths:
+            - environment
             - espurna/firmware/
     script:
         - . venv/bin/activate
