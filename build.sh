@@ -4,9 +4,9 @@ pushd espurna/code
 
 # Nice logging
 g_echo() {
-    local c_start='\033[1;32m'
+    local c_start='\033[0;33m'
     local c_end='\033[0m'
-    echo -e "${c_start}"${*}"${c_end}"
+    echo -ne "${c_start}"$*"${c_end}\n"
 }
 
 # Reuse parallel build implementation from https://github.com/xoseperez/espurna/pull/986 (kudos to @lobradov)
@@ -35,7 +35,7 @@ OUTPUT_DIR="../firmware/espurna-${APP_VERSION}"
 
 mkdir -p ${OUTPUT_DIR}
 for environment in $environments ; do
-    g_echo " * $environment"
+    g_echo "[*] $environment"
     time platformio run -s -e $environment
     cp .pioenvs/$environment/firmware.bin ${OUTPUT_DIR}/espurna-${APP_VERSION}.git${APP_REVISION}-${environment}.bin
 done

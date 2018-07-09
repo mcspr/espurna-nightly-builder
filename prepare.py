@@ -16,7 +16,7 @@ INO = "void setup(){}\nvoid loop(){}\n"
 
 
 def c_print(msg):
-    print('\x1b[1;32m{}\x1b[0m'.format(msg))
+    print('\x1b[0;33m{}\x1b[0m'.format(msg))
 
 
 def get_pio_libraries(cwd, platformio_ini="platformio.ini"):
