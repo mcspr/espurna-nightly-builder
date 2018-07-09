@@ -1,4 +1,4 @@
-image: registry.gitlab.com/mcspr/espurna-travis-test:latest
+#image: registry.gitlab.com/mcspr/espurna-travis-test:latest
 
 stages:
     - prepare
@@ -16,9 +16,11 @@ prepare:test:
         expire_in: 10m
         paths:
             - espurna/firmware/
+    before_script:
+        - apt-get update -qq && apt-get install -y python-pip
     script:
         - python -V
-        - virtualenv ./venv && source venv/bin/activate && pip install platformio
+        - pip install platformio
         - git clone --depth=1 https://github.com/xoseperez/espurna
         - cd espurna/code
         - platformio run -e itead-sonoff-basic
