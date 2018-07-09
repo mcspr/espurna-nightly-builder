@@ -5,6 +5,11 @@ import time
 import sys
 import subprocess
 
+try:
+    from urllib.parse import urljoin
+except ImportError:
+    from urlparse import urljoin
+
 import requests
 
 
@@ -52,7 +57,7 @@ def get_latest_release_description(token, endpoint="https://api.github.com/graph
 
     (release, ) = result["data"]["repository"]["releases"]["nodes"]
 
-    url = "https://github.com{}".format(release["resourcePath"])
+    url = urljoin("https://github.com", release["resourcePath"])
 
     print("> Latest release:")
     print("url: {}".format(url))
