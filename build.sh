@@ -24,7 +24,7 @@ APP_REVISION=$(git rev-parse --short HEAD)
 APP_VERSION=$(grep APP_VERSION espurna/config/version.h | awk '{print $3}' | sed 's/"//g')
 OUTPUT_DIR="../firmware/espurna-${APP_VERSION}"
 
-time node node_modules/gulp/bin/gulp.js
+[[ $TRAVIS = "true" ]] && time node node_modules/gulp/bin/gulp.js
 
 mkdir -p ${OUTPUT_DIR}
 for environment in $environments ; do
