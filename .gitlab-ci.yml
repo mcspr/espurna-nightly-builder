@@ -33,7 +33,7 @@ prepare:platformio:
     only:
         - schedules
 
-build:template: &build_template
+.build:template: &build_template
     stage: build
     dependencies:
         - prepare:platformio
