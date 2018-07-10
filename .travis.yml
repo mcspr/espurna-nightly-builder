@@ -67,7 +67,7 @@ deploy:
 stages:
   - name: "Test"
   - name: "Release"
-    if: type = cron
+    if: type IN (cron, api)
 
 script:
   - bash build.sh
