@@ -59,6 +59,7 @@ deploy:
   file: espurna/firmware/**/*
   skip_cleanup: true
   body: ${ESPURNA_RELEASE_BODY}
+  tag_name: ${ESPURNA_RELEASE_TAG}
   on:
     branch: builder
     repo: mcspr/espurna-travis-test
