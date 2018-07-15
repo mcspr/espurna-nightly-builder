@@ -1,0 +1,84 @@
+sudo: false
+conditions: v1
+language: python
+python:
+- '2.7'
+
+env:
+  global:
+  - PLATFORMIO_LIBDEPS_DIR="${HOME}/pio-libdeps"
+  - BUILDER_TOTAL_THREADS=4
+
+cache:
+  directories:
+  - ${HOME}/.npm
+  - ${HOME}/.cache/pip
+  - ${HOME}/.platformio
+  - ${HOME}/pio-libdeps
+  - ${HOME}/espurna/code/node_modules
+
+install:
+  - env | grep TRAVIS
+  - |
+    mkdir -p espurna
+    pushd espurna
+    git init
+    git remote add origin https://github.com/xoseperez/espurna
+    popd
+  - |
+    pip install -U requests
+    python prepare_env.py && cat environment && source environment
+    [[ ${ESPURNA_DO_RELEASE} = "True" ]] || exit
+  - |
+    pushd espurna
+    git fetch --depth=1 origin $ESPURNA_COMMIT
+    git checkout FETCH_HEAD
+    popd
+  - |
+    pushd espurna/code
+    pip install -U platformio
+    mkdir -p node_modules
+    if [ ! -e node_modules/gulp/bin/gulp.js ] ; then
+        npm install --only=dev
+    fi
+    popd
+
+# XXX override deploy target repo XXX
+#before_deploy:
+#  - export TRAVIS_REPO_SLUG=mcspr/espurna
+
+before_deploy:
+    - export TRAVIS_TAG=$ESPURNA_RELEASE_TAG
+
+deploy:
+  provider: releases
+  api_key: ${GITHUB_TOKEN}
+  file_glob: true
+  file: espurna/firmware/**/*
+  skip_cleanup: true
+  body: ${ESPURNA_RELEASE_BODY}
+  on:
+    branch: builder
+    repo: mcspr/espurna-travis-test
+    condition: $TRAVIS_BUILD_STAGE_NAME = Release
+
+stages:
+  - name: "Test"
+  - name: "Release"
+    if: type IN (cron, api)
+
+script:
+  - bash build.sh
+
+jobs:
+  include:
+  - stage: "Test"
+    script: true
+  - stage: "Release"
+    env: BUILDER_THREAD=0
+  - env: BUILDER_THREAD=1
+  - env: BUILDER_THREAD=2
+  - env: BUILDER_THREAD=3
+
+notifications:
+  email: false

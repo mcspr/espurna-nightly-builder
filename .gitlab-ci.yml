@@ -1,0 +1,110 @@
+image: registry.gitlab.com/mcspr/espurna-travis-test:latest
+
+stages:
+    - prepare
+    - build
+    - package
+
+variables:
+    DOCKER_DRIVER: "overlay2"
+    PLATFORMIO_HOME_DIR: "$CI_PROJECT_DIR/platformio"
+    BUILDER_TOTAL_THREADS: 4
+
+prepare:test:
+    stage: prepare
+    artifacts:
+        expire_in: 10m
+        paths:
+            - espurna/firmware/
+    script:
+        - python -V
+        - cat /proc/cpuinfo
+        - virtualenv venv && source venv/bin/activate
+        - pip install platformio
+        - git clone --depth=1 https://github.com/xoseperez/espurna
+        - pio run -d espurna/code -e itead-sonoff-basic
+        - pio run -d espurna/code -e itead-sonoff-pow
+    only:
+        - web
+
+prepare:platformio:
+    stage: prepare
+    artifacts:
+        expire_in: 1h
+        paths:
+            - platformio/
+            - venv/
+            - espurna/
+            - environment
+    script:
+        - python -V
+        - virtualenv ./venv
+        - . venv/bin/activate
+        - mkdir -p espurna
+        - pushd espurna && git init && git remote add origin https://github.com/xoseperez/espurna && popd
+        - pip install -U requests
+        - python2 prepare_env.py && cat environment && source environment
+        - "[[ ${ESPURNA_DO_RELEASE} = \"True\" ]] || exit 10"
+        - pushd espurna && git fetch --depth=1 origin refs/heads/dev && git checkout FETCH_HEAD && popd
+        - pip install -U platformio
+        - python2 prepare.py espurna/code
+    only:
+        - schedules
+
+.build:template: &build_template
+    stage: build
+    dependencies:
+        - prepare:platformio
+    artifacts:
+        expire_in: 15m
+        paths:
+            - environment
+            - espurna/firmware/
+    script:
+        - . venv/bin/activate
+        - ./build.sh
+    only:
+        - schedules
+
+build:builder_0:
+    before_script:
+        - export BUILDER_TOTAL_THREADS=$BUILDER_TOTAL_THREADS
+        - export BUILDER_THREAD=0
+    <<: *build_template
+
+build:builder_1:
+    before_script:
+        - export BUILDER_TOTAL_THREADS=$BUILDER_TOTAL_THREADS
+        - export BUILDER_THREAD=1
+    <<: *build_template
+
+build:builder_2:
+    before_script:
+        - export BUILDER_TOTAL_THREADS=$BUILDER_TOTAL_THREADS
+        - export BUILDER_THREAD=2
+    <<: *build_template
+
+build:builder_3:
+    before_script:
+        - export BUILDER_TOTAL_THREADS=$BUILDER_TOTAL_THREADS
+        - export BUILDER_THREAD=3
+    <<: *build_template
+
+package:release:
+    stage: package
+    dependencies:
+        - build:builder_0
+        - build:builder_1
+        - build:builder_2
+        - build:builder_3
+    artifacts:
+        expire_in: 1h
+        paths:
+            - release.tar.xz
+    script:
+        - tar cJf release.tar.xz espurna/firmware/
+        - source environment
+        - cd espurna/firmware/*
+        - ghr -u mcspr -r espurna-travis-test -b ${ESPURNA_RELEASE_BODY} ${ESPURNA_RELEASE_TAG} ./
+    only:
+        - schedules
