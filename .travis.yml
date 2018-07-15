@@ -48,9 +48,7 @@ install:
 #  - export TRAVIS_REPO_SLUG=mcspr/espurna
 
 before_deploy:
-    - git config --local user.name "espurna-travis-test"
-    - git config --local user.email "prokhorov.max@outlook.com"
-    - git tag "${ESPURNA_RELEASE_TAG}"
+    - export TRAVIS_TAG=$ESPURNA_RELEASE_TAG
 
 deploy:
   provider: releases
@@ -59,7 +57,6 @@ deploy:
   file: espurna/firmware/**/*
   skip_cleanup: true
   body: ${ESPURNA_RELEASE_BODY}
-  tag_name: ${ESPURNA_RELEASE_TAG}
   on:
     branch: builder
     repo: mcspr/espurna-travis-test
