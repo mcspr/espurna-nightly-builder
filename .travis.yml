@@ -49,6 +49,7 @@ install:
 
 before_deploy:
     - export TRAVIS_TAG=$ESPURNA_RELEASE_TAG
+    - bash rename_app_revision.sh
 
 deploy:
   provider: releases
@@ -68,7 +69,7 @@ stages:
     if: type IN (cron, api)
 
 script:
-  - bash build.sh
+  - pushd espurna/code && bash build.sh -p && popd
 
 jobs:
   include:
