@@ -36,7 +36,7 @@ def get_heads(branches, cwd="espurna"):
     return commits
 
 
-def get_latest_release_description(token, endpoint="https://api.github.com/graphql"):
+def get_latest_release_commit(token, endpoint="https://api.github.com/graphql"):
     query = """
     query {
         repository(owner:\"mcspr\", name:\"espurna-travis-test\") {
@@ -63,11 +63,15 @@ def get_latest_release_description(token, endpoint="https://api.github.com/graph
 
     url = urljoin("https://github.com", release["resourcePath"])
 
-    c_print(">>> Latest release <<<")
-    c_print("url: {}".format(url))
-    c_print("date: {}".format(release["publishedAt"]))
+    c_print(">>> Latest release <<<\n"
+    "url: https://github.com/{resourcePath}\n"
+    "date: {publishedAt}\n"
+    "description: {description}".format(**release))
 
-    return release["description"]
+    if not release["description"]:
+        return None
+
+    return release["description"].split("/")[-1]
 
 
 def write_env_and_exit(commit, do_release, filename="environment"):
@@ -86,12 +90,11 @@ if __name__ == "__main__":
         c_print("Skipping normal release")
         write_env_and_exit(None, False)
 
-    release_desc = get_latest_release_description(os.environ["GITHUB_TOKEN"])
-    if not release_desc:
-        c_print("No release description on previous build")
+    release_commit = get_latest_release_commit(os.environ["GITHUB_TOKEN"])
+    if not release_commit:
+        c_print("No commit bound to the previous build")
         write_env_and_exit(None, False)
 
-    release_commit = release_desc.split("/")[-1]
     if commits["dev"] == release_commit:
         c_print("Skipping already released commit")
         write_env_and_exit(None, False)
