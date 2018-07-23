@@ -42,9 +42,9 @@ def get_latest_release_commit(token, endpoint="https://api.github.com/graphql"):
         repository(owner:\"mcspr\", name:\"espurna-travis-test\") {
             releases(last:1) {
                 nodes {
+                    url
                     publishedAt
                     description
-                    resourcePath
                 }
             }
         }
@@ -61,10 +61,8 @@ def get_latest_release_commit(token, endpoint="https://api.github.com/graphql"):
 
     (release, ) = result["data"]["repository"]["releases"]["nodes"]
 
-    url = urljoin("https://github.com", release["resourcePath"])
-
     c_print(">>> Latest release <<<\n"
-    "url: https://github.com/{resourcePath}\n"
+    "url: {url}\n"
     "date: {publishedAt}\n"
     "description: {description}".format(**release))
 
@@ -92,7 +90,7 @@ if __name__ == "__main__":
 
     release_commit = get_latest_release_commit(os.environ["GITHUB_TOKEN"])
     if not release_commit:
-        c_print("No commit bound to the previous build")
+        c_print("No commit bound to the previous release")
         write_env_and_exit(None, False)
 
     if commits["dev"] == release_commit:
