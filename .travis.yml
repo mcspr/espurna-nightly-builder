@@ -33,6 +33,7 @@ install:
     pushd espurna
     git fetch --depth=1 origin $ESPURNA_COMMIT
     git checkout FETCH_HEAD
+    sed -i '/describe/s/^    git_version.*/    git_version=${version}-${git_revision}/' code/build.sh
     popd
   - |
     pushd espurna/code
