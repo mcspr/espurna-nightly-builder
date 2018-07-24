@@ -13,5 +13,3 @@ for fwbin in ${BIN_DIR}/* ; do
     new_fwbin=${BIN_DIR}/${new_fwbin/${OLD_MASK}/${NEW_MASK}}
     mv -v $fwbin $new_fwbin
 done
-
-popd
