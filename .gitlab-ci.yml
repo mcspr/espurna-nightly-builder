@@ -62,7 +62,7 @@ prepare:platformio:
             - espurna/firmware/
     script:
         - . venv/bin/activate
-        - ./build.sh
+        - cd espurna/code && ./build.sh -p
     only:
         - schedules
 
@@ -104,6 +104,7 @@ package:release:
     script:
         - tar cJf release.tar.xz espurna/firmware/
         - source environment
+        - bash rename_app_revision.sh
         - cd espurna/firmware/*
         - ghr -u mcspr -r espurna-travis-test -b ${ESPURNA_RELEASE_BODY} ${ESPURNA_RELEASE_TAG} ./
     only:
