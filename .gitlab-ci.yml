@@ -62,7 +62,7 @@ prepare:platformio:
             - espurna/firmware/
     script:
         - . venv/bin/activate
-        - cd espurna/code && ./build.sh -p
+        - cd espurna/code && TRAVIS_BUILD_STAGE_NAME=Release ./build.sh -p
     only:
         - schedules
 
