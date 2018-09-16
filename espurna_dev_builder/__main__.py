@@ -40,17 +40,46 @@ else:
 
 API = Api(TOKEN)
 
-target_repo = Repo("xoseperez/espurna", api=API)
-builder_repo = Repo("mcspr/espurna-travis-test", api=API)
-
 parser = argparse.ArgumentParser()
-parser.add_argument("mode", choices=["prepare", "mkenv", "setup_repo"])
+subparser = parser.add_subparsers()
+
+parser.add_argument("--commit-filename", default="commit.txt")
+parser.add_argument("--target-branch", default="dev")
+parser.add_argument("--builder-branch", default="nightly")
+
+
+def f_prepare(args):
+    target_repo = Repo(args.target_repo, api=API)
+    builder_repo = Repo(args.builder_repo, api=API)
+    prepare(
+        target_repo,
+        builder_repo,
+        target_branch=args.target_branch,
+        builder_branch=args.builder_branch,
+        commit_filename=args.commit_filename,
+    )
+
+
+def f_mkenv(args):
+    builder_repo = Repo(args.builder_repo, api=API)
+    mkenv(builder_repo)
+
+
+def f_setup_repo(args):
+    setup_repo(branch=args.builder_branch, commit_filename=args.commit_filename)
+
+
+cmd_prepare = subparser.add_parser("prepare")
+cmd_prepare.add_argument("target_repo")
+cmd_prepare.add_argument("builder_repo")
+cmd_prepare.set_defaults(func=f_prepare)
+
+cmd_mkenv = subparser.add_parser("mkenv")
+cmd_mkenv.add_argument("builder_repo")
+cmd_mkenv.set_defaults(func=f_mkenv)
+
+cmd_setup_repo = subparser.add_parser("setup_repo")
+cmd_setup_repo.set_defaults(func=f_setup_repo)
 args = parser.parse_args()
 
-
-if args.mode == "prepare":
-    prepare(target_repo, builder_repo, target_branch="dev", builder_branch="nightly")
-elif args.mode == "mkenv":
-    mkenv(builder_repo)
-elif args.mode == "setup_repo":
-    setup_repo()
+args.func(args)

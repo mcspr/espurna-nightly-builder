@@ -12,7 +12,7 @@ def prepare(
     builder_repo,
     target_branch="dev",
     builder_branch="nightly",
-    cfilename="commit.txt",
+    commit_filename="commit.txt",
 ):
     head_sha = target_repo.branch_head(target_branch)
     log.info("head commit: {}".format(head_sha))
@@ -24,7 +24,7 @@ def prepare(
     if state != "success":
         raise errors.Unbuildable
 
-    commit_file = builder_repo.file(builder_branch, cfilename)
+    commit_file = builder_repo.file(builder_branch, commit_filename)
     if not commit_file.content:
         raise errors.NoContent
 
