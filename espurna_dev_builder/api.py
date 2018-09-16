@@ -1,8 +1,6 @@
 #!/usr/bin/env python
-import os
 import json
-import time
-import sys
+import logging
 import base64
 
 try:
@@ -13,23 +11,19 @@ except ImportError:
 import requests
 
 
+logging.basicConfig()
+log = logging.getLogger(__name__)
+
+
 def enable_requests_debug():
-    import logging
-
-    logging.basicConfig()
-    logging.getLogger().setLevel(logging.DEBUG)
-
     import http.client
-
     http.client.HTTPConnection.debuglevel = 1
+
+    log.setLevel(logging.DEBUG)
 
     requests_log = logging.getLogger("requests.packages.urllib3")
     requests_log.setLevel(logging.DEBUG)
     requests_log.propagate = True
-
-
-def c_print(msg):
-    print("\x1b[0;33m{}\x1b[0m".format(msg))
 
 
 class File(object):
@@ -96,19 +90,22 @@ class Api(object):
 
 
 class Repo(object):
-    def __init__(self, owner, name, api):
-        self.name = name
-        self.owner = owner
-        self.base = "repos/{}/{}".format(owner, name)
+    def __init__(self, slug, api):
+        self.slug = slug
         self.api = api
+        self.base = "repos/{}".format(slug)
+
+        owner, name = slug.split('/')
+        self.owner = owner
+        self.name = name
 
     # TODO uritemplate?
     def _base(self, path):
         return "{}/{}".format(self.base, path)
 
     def compare_url(self, start, end):
-        url = "https://github.com/{owner}/{repo}/compare/{start}...{end}".format(
-            owner=self.owner, repo=self.repo, start=start, end=end
+        url = "https://github.com/{owner}/{name}/compare/{start}...{end}".format(
+            owner=self.owner, name=self.name, start=start, end=end
         )
         return url
 
@@ -165,6 +162,7 @@ class Repo(object):
             repository(owner:\"OWNER\", name:\"NAME\") {
                 releases(last:1) {
                     nodes {
+                        id
                         url
                         publishedAt
                         tag {
@@ -182,79 +180,22 @@ class Repo(object):
         res = self.api.graphql_query(query)
         (release,) = res["data"]["repository"]["releases"]["nodes"]
 
+        # XXX is this reliable?
+        id = release["id"]
+        del release["id"]
+        id = base64.b64decode(id.encode("ascii")).decode("ascii")
+        number = id.partition("Release")[-1]
+        release["number"] = int(number)
+
+        sha = release["tag"]["target"]["oid"]
+        del release["tag"]
+        release["sha"] = sha
+
         return release
 
 
 def release_is_head(repo, head_sha):
     release = repo.latest_release()
-
-    commit = release["tag"]["target"]
-    release_sha = commit["oid"]
+    release_sha = release["sha"]
 
     return release_sha == head_sha
-
-
-# TODO argparse?
-def get_env_config():
-    token = os.environ.get("GITHUB_TOKEN")
-    if not token:
-        raise ValueError("no token configured?")
-
-    event = os.environ.get("TRAVIS_EVENT_TYPE")
-    if not event:
-        raise ValueError("not in travis?")
-
-    return token, event
-
-
-BRANCH = "nightly"
-TOKEN, EVENT = get_env_config()
-API = Api(TOKEN)
-
-
-if __name__ == "__main__":
-    if EVENT == "api":
-        c_print("Continuing to the next stage")
-        sys.exit(0)
-    elif EVENT == "cron":
-        c_print("Starting nightly builder checks")
-    else:
-        c_print("Unknown travis event type")
-        sys.exit(1)
-
-    target_repo = Repo("xoseperez", "espurna", api=API)
-    builder_repo = Repo("mcspr", "espurna-travis-test", api=API)
-
-    head_sha = target_repo.branch_head("dev")
-    print("head commit: {}".format(head_sha))
-    if release_is_head(target_repo, head_sha):
-        c_print("Skipping commit released at the target repo")
-        sys.exit(2)
-
-    state, _ = target_repo.commit_status(head_sha)
-    print("commit state: {}".format(state))
-    if state != "success":
-        c_print("Skipping not buildable commit")
-        sys.exit(3)
-
-    commit_file = builder_repo.file(BRANCH, "commit.txt")
-    if not commit_file.content:
-        c_print("commit.txt has no content?")
-        sys.exit(4)
-
-    old_sha = commit_file.content
-
-    print("latest nightly: {}".format(old_sha))
-    if old_sha == head_sha:
-        c_print("Skipping already released nightly")
-        sys.exit(5)
-
-    commit_file.content = head_sha
-    msg = "nightly build / {}".format(tag)
-    _, builder_commit = builder_repo.update_file(BRANCH, commit_file, msg)
-
-    builder_repo.release(
-        time.strftime("%Y%m%d"),
-        builder_commit["sha"],
-        target_repo.compare_url(old_sha, head_sha),
-    )

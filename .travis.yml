@@ -20,20 +20,23 @@ cache:
 install:
   - env | grep TRAVIS
   - |
+    pip install .
+    if [ ${TRAVIS_BUILD_STAGE_NAME} = "Test" ]; then
+        python -mespurna_dev_builder prepare
+        exit 0
+    fi
+    if [ ${TRAVIS_BUILD_STAGE_NAME} = "Release" ]; then
+        python -mespurna_dev_builder mkenv
+        source environment
+    fi
+    [[ ${ESPURNA_DO_RELEASE} = "True" ]] || exit
+  - |
     mkdir -p espurna
     pushd espurna
     git init
     git remote add origin https://github.com/xoseperez/espurna
-    popd
-  - |
-    pip install -U requests
-    python prepare_env.py && cat environment && source environment
-    [[ ${ESPURNA_DO_RELEASE} = "True" ]] || exit
-  - |
-    pushd espurna
     git fetch --depth=1 origin $ESPURNA_COMMIT
     git checkout FETCH_HEAD
-    sed -i '/describe/s/^    git_version.*/    git_version=${version}-${git_revision}/' code/build.sh
     popd
   - |
     pushd espurna/code
@@ -49,7 +52,6 @@ install:
 #  - export TRAVIS_REPO_SLUG=mcspr/espurna
 
 before_deploy:
-    - export TRAVIS_TAG=$ESPURNA_RELEASE_TAG
     - bash rename_app_revision.sh
 
 deploy:
@@ -57,8 +59,9 @@ deploy:
   api_key: ${GITHUB_TOKEN}
   file_glob: true
   file: espurna/firmware/**/*
+  overwrite: true
   skip_cleanup: true
-  body: ${ESPURNA_RELEASE_BODY}
+  release_number: ${TRAVIS_RELEASE_NUMBER}
   on:
     branch: builder
     repo: mcspr/espurna-travis-test

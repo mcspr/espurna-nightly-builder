@@ -16,3 +16,5 @@ custom.h
 .DS_Store
 .vscode
 .gitignore
+__pycache__
+*.pyc
