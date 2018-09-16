@@ -29,15 +29,7 @@ install:
         python -mespurna_dev_builder mkenv
         source environment
     fi
-    [[ ${ESPURNA_DO_RELEASE} = "True" ]] || exit
-  - |
-    mkdir -p espurna
-    pushd espurna
-    git init
-    git remote add origin https://github.com/xoseperez/espurna
-    git fetch --depth=1 origin $ESPURNA_COMMIT
-    git checkout FETCH_HEAD
-    popd
+  - git clone --depth=1 https://github.com/xoseperez/espurna
   - |
     pushd espurna/code
     pip install -U platformio
