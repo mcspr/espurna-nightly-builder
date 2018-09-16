@@ -11,7 +11,6 @@ except ImportError:
 import requests
 
 
-logging.basicConfig()
 log = logging.getLogger(__name__)
 
 

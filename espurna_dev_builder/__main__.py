@@ -1,9 +1,9 @@
 import argparse
 import logging
 import os
-import time
 import sys
 
+logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 from espurna_dev_builder.api import Repo, Api
