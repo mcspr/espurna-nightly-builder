@@ -6,7 +6,14 @@ from espurna_dev_builder.api import release_is_head
 
 log = logging.getLogger(__name__)
 
-def prepare(target_repo, builder_repo, target_branch="dev", builder_branch="nightly", cfilename="commit.txt"):
+
+def prepare(
+    target_repo,
+    builder_repo,
+    target_branch="dev",
+    builder_branch="nightly",
+    cfilename="commit.txt",
+):
     head_sha = target_repo.branch_head(target_branch)
     log.info("head commit: {}".format(head_sha))
     if release_is_head(target_repo, head_sha):
@@ -33,7 +40,5 @@ def prepare(target_repo, builder_repo, target_branch="dev", builder_branch="nigh
     _, builder_commit = builder_repo.update_file(builder_branch, commit_file, msg)
 
     builder_repo.release(
-        tag,
-        builder_commit["sha"],
-        target_repo.compare_url(old_sha, head_sha),
+        tag, builder_commit["sha"], target_repo.compare_url(old_sha, head_sha)
     )

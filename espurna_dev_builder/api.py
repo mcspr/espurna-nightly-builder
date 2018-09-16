@@ -16,6 +16,7 @@ log = logging.getLogger(__name__)
 
 def enable_requests_debug():
     import http.client
+
     http.client.HTTPConnection.debuglevel = 1
 
     log.setLevel(logging.DEBUG)
@@ -47,7 +48,7 @@ class File(object):
         return '<File(path="{}",sha="{}">'.format(self.path, self.sha)
 
 
-#TODO separate lib?
+# TODO separate lib?
 class Api(object):
 
     BASE_REST = "https://api.github.com/"
@@ -94,7 +95,7 @@ class Repo(object):
         self.api = api
         self.base = "repos/{}".format(slug)
 
-        owner, name = slug.split('/')
+        owner, name = slug.split("/")
         self.owner = owner
         self.name = name
 

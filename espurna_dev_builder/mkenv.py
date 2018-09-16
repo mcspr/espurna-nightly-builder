@@ -1,5 +1,7 @@
 import logging
+
 log = logging.getLogger(__name__)
+
 
 def mkenv(repo):
     release = repo.latest_release()
