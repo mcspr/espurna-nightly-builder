@@ -9,6 +9,7 @@ log = logging.getLogger("main")
 from espurna_dev_builder.api import Repo, Api
 from espurna_dev_builder.prepare import prepare
 from espurna_dev_builder.mkenv import mkenv
+from espurna_dev_builder.setup_repo import setup_repo
 from espurna_dev_builder.errors import Error
 
 
@@ -43,7 +44,7 @@ target_repo = Repo("xoseperez/espurna", api=API)
 builder_repo = Repo("mcspr/espurna-travis-test", api=API)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("mode", choices=["prepare", "mkenv"])
+parser.add_argument("mode", choices=["prepare", "mkenv", "setup_repo"])
 args = parser.parse_args()
 
 
@@ -51,3 +52,5 @@ if args.mode == "prepare":
     prepare(target_repo, builder_repo, target_branch="dev", builder_branch="nightly")
 elif args.mode == "mkenv":
     mkenv(builder_repo)
+elif args.mode == "setup_repo":
+    setup_repo()
