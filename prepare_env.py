@@ -3,7 +3,7 @@ import os
 import json
 import time
 import sys
-import subprocess
+import base64
 
 try:
     from urllib.parse import urljoin
@@ -13,88 +13,248 @@ except ImportError:
 import requests
 
 
+def enable_requests_debug():
+    import logging
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.DEBUG)
+
+    import http.client
+
+    http.client.HTTPConnection.debuglevel = 1
+
+    requests_log = logging.getLogger("requests.packages.urllib3")
+    requests_log.setLevel(logging.DEBUG)
+    requests_log.propagate = True
+
+
 def c_print(msg):
-    print('\x1b[0;33m{}\x1b[0m'.format(msg))
+    print("\x1b[0;33m{}\x1b[0m".format(msg))
 
 
-def get_heads(branches, cwd="espurna"):
-    cmd = ["git", "ls-remote", "--heads", "origin"]
-    for branch in branches:
-        cmd.append("refs/heads/{}".format(branch))
+class File(object):
+    def __init__(self, data, enc="ascii"):
+        self.name = data["name"]
+        self.path = data["path"]
+        self.sha = data["sha"]
 
-    output = subprocess.check_output(cmd, cwd=cwd)
-    output = output.decode("utf-8")
+        content = base64.b64decode(data["content"])
+        content = content.decode(enc).strip()
+        self.content = content
 
-    commits = {}
-    lines = output.split("\n")
-    for line in lines:
-        if not line:
-            continue
-        commit, ref = line.split("\t")
-        commits[ref.split("/")[-1]] = commit
+    def encode_content(self, enc=None):
+        data = self.content.encode("ascii")
+        data = base64.b64encode(data)
+        if enc:
+            data = data.decode(enc)
 
-    return commits
+        return data
+
+    def __repr__(self):
+        return '<File(path="{}",sha="{}">'.format(self.path, self.sha)
 
 
-def get_latest_release_commit(token, endpoint="https://api.github.com/graphql"):
-    query = """
-    query {
-        repository(owner:\"mcspr\", name:\"espurna-travis-test\") {
-            releases(last:1) {
-                nodes {
-                    url
-                    publishedAt
-                    description
+#TODO separate lib?
+class Api(object):
+
+    BASE_REST = "https://api.github.com/"
+    BASE_GRAPHQL = "https://api.github.com/graphql"
+    USER_AGENT = "mcspr/espurna-travis-test/builder-v1.0"
+
+    def __init__(self, token):
+        self.token = token
+
+        self._http = requests.Session()
+        self._http.headers.update(
+            {"User-Agent": self.USER_AGENT, "Authorization": "token {}".format(token)}
+        )
+
+    def get(self, path, params=None, headers=None):
+        url = urljoin(self.BASE_REST, path)
+        res = self._http.get(url, params=params, headers=headers)
+        return res
+
+    def get_json(self, path, params=None, headers=None):
+        return self.get(path, params=params, headers=headers).json()
+
+    def put_json(self, path, data, headers=None):
+        url = urljoin(self.BASE_REST, path)
+        res = self._http.put(url, json=data, headers=None)
+        return res.json()
+
+    def post_json(self, path, data, headers=None):
+        url = urljoin(self.BASE_REST, path)
+        res = self._http.post(url, json=data, headers=None)
+        return res.json()
+
+    def graphql_query(self, query):
+        data = json.dumps({"query": query})
+        res = self._http.post(self.BASE_GRAPHQL, data=data)
+        res = res.json()
+
+        return res
+
+
+class Repo(object):
+    def __init__(self, owner, name, api):
+        self.name = name
+        self.owner = owner
+        self.base = "repos/{}/{}".format(owner, name)
+        self.api = api
+
+    # TODO uritemplate?
+    def _base(self, path):
+        return "{}/{}".format(self.base, path)
+
+    def compare_url(self, start, end):
+        url = "https://github.com/{owner}/{repo}/compare/{start}...{end}".format(
+            owner=self.owner, repo=self.repo, start=start, end=end
+        )
+        return url
+
+    def file(self, ref, filepath):
+        path = self._base("contents/{}".format(filepath))
+        res = self.api.get_json(path, params={"ref": ref})
+        return File(res)
+
+    def update_file(self, branch, fileobj, message):
+        path = self._base("contents/{}".format(fileobj.path))
+        res = self.api.put_json(
+            path,
+            data={
+                "branch": branch,
+                "message": message,
+                "content": fileobj.encode_content(enc="ascii"),
+                "sha": fileobj.sha,
+            },
+        )
+        return (res["content"], res["commit"])
+
+    def release(self, tag, sha, body):
+        path = self._base("releases")
+        res = self.api.post_json(
+            path, data={"tag_name": tag, "target_commitish": sha, "body": body}
+        )
+        return res
+
+    # TODO tag object, not ref. does github display this ever?
+    def tag_object(self, commit, name, message):
+        path = self._base("git/tags")
+        sha = commit["sha"]
+        res = self.api.post_json(
+            path, {"type": "commit", "tag": name, "object": sha, "message": message}
+        )
+        return res
+
+    def commit_status(self, sha):
+        path = self._base("commits/{}/status".format(sha))
+        res = self.api.get_json(path)
+        return (res["state"], res["statuses"])
+
+    def branch_head(self, branch):
+        path = self._base("branches/{}".format(branch))
+        res = self.api.get_json(path)
+        return res["commit"]["sha"]
+
+    # TODO find lib that does both api v3 and v4?
+    # v4: graphql returns MUCH less data.
+    # v3: /releases/latest also contains assets, which we don't need
+    def latest_release(self):
+        query = """
+        query {
+            repository(owner:\"OWNER\", name:\"NAME\") {
+                releases(last:1) {
+                    nodes {
+                        url
+                        publishedAt
+                        tag {
+                            target {
+                                oid
+                                commitUrl
+                            }
+                        }
+                    }
                 }
             }
-        }
-    }""".strip()
-    query = json.dumps({"query": query})
+        }"""
+        query = query.replace("OWNER", self.owner).replace("NAME", self.name).strip()
 
-    headers = {
-        "Authorization": "token {}".format(token),
-        "User-Agent": "mcspr/espurna-travis-test/builder-v1.0"
-    }
+        res = self.api.graphql_query(query)
+        (release,) = res["data"]["repository"]["releases"]["nodes"]
 
-    result = requests.post(endpoint,headers=headers, data=query)
-    result = result.json()
-
-    (release, ) = result["data"]["repository"]["releases"]["nodes"]
-
-    c_print(">>> Latest release <<<\n"
-    "url: {url}\n"
-    "date: {publishedAt}\n"
-    "description: {description}".format(**release))
-
-    if not release["description"]:
-        return None
-
-    return release["description"].split("/")[-1]
+        return release
 
 
-def write_env_and_exit(commit, do_release, filename="environment"):
-    with open(filename, "w") as env:
-        if commit:
-            env.write("export ESPURNA_COMMIT={}\n".format(commit))
-            env.write("export ESPURNA_RELEASE_TAG={}\n".format(time.strftime("%Y%m%d")))
-            env.write("export ESPURNA_RELEASE_BODY=\"https://github.com/xoseperez/espurna/commit/{}\"\n".format(commit))
-        env.write("export ESPURNA_DO_RELEASE={}\n".format(do_release))
-    sys.exit(0)
+def release_is_head(repo, head_sha):
+    release = repo.latest_release()
+
+    commit = release["tag"]["target"]
+    release_sha = commit["oid"]
+
+    return release_sha == head_sha
+
+
+# TODO argparse?
+def get_env_config():
+    token = os.environ.get("GITHUB_TOKEN")
+    if not token:
+        raise ValueError("no token configured?")
+
+    event = os.environ.get("TRAVIS_EVENT_TYPE")
+    if not event:
+        raise ValueError("not in travis?")
+
+    return token, event
+
+
+BRANCH = "nightly"
+TOKEN, EVENT = get_env_config()
+API = Api(TOKEN)
 
 
 if __name__ == "__main__":
-    commits = get_heads(["dev", "master"])
-    if commits["dev"] == commits["master"]:
-        c_print("Skipping normal release")
-        write_env_and_exit(None, False)
+    if EVENT == "api":
+        c_print("Continuing to the next stage")
+        sys.exit(0)
+    elif EVENT == "cron":
+        c_print("Starting nightly builder checks")
+    else:
+        c_print("Unknown travis event type")
+        sys.exit(1)
 
-    release_commit = get_latest_release_commit(os.environ["GITHUB_TOKEN"])
-    if not release_commit:
-        c_print("No commit bound to the previous release")
-        write_env_and_exit(None, False)
+    target_repo = Repo("xoseperez", "espurna", api=API)
+    builder_repo = Repo("mcspr", "espurna-travis-test", api=API)
 
-    if commits["dev"] == release_commit:
-        c_print("Skipping already released commit")
-        write_env_and_exit(None, False)
+    head_sha = target_repo.branch_head("dev")
+    print("head commit: {}".format(head_sha))
+    if release_is_head(target_repo, head_sha):
+        c_print("Skipping commit released at the target repo")
+        sys.exit(2)
 
-    write_env_and_exit(commits["dev"], True)
+    state, _ = target_repo.commit_status(head_sha)
+    print("commit state: {}".format(state))
+    if state != "success":
+        c_print("Skipping not buildable commit")
+        sys.exit(3)
+
+    commit_file = builder_repo.file(BRANCH, "commit.txt")
+    if not commit_file.content:
+        c_print("commit.txt has no content?")
+        sys.exit(4)
+
+    old_sha = commit_file.content
+
+    print("latest nightly: {}".format(old_sha))
+    if old_sha == head_sha:
+        c_print("Skipping already released nightly")
+        sys.exit(5)
+
+    commit_file.content = head_sha
+    msg = "nightly build / {}".format(tag)
+    _, builder_commit = builder_repo.update_file(BRANCH, commit_file, msg)
+
+    builder_repo.release(
+        time.strftime("%Y%m%d"),
+        builder_commit["sha"],
+        target_repo.compare_url(old_sha, head_sha),
+    )
