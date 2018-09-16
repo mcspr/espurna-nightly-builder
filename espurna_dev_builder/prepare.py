@@ -28,11 +28,12 @@ def prepare(target_repo, builder_repo, target_branch="dev", builder_branch="nigh
         raise errors.Released
 
     commit_file.content = head_sha
+    tag = time.strftime("%Y%m%d")
     msg = "nightly build / {}".format(tag)
     _, builder_commit = builder_repo.update_file(builder_branch, commit_file, msg)
 
     builder_repo.release(
-        time.strftime("%Y%m%d"),
+        tag,
         builder_commit["sha"],
         target_repo.compare_url(old_sha, head_sha),
     )
