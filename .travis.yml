@@ -29,7 +29,7 @@ install:
         python -mespurna_dev_builder mkenv
         source environment
     fi
-  - git clone --depth=1 https://github.com/xoseperez/espurna
+  - git clone --branch dev --no-tags --single-branch --depth=1 https://github.com/xoseperez/espurna
   - |
     pushd espurna/code
     pip install -U platformio
