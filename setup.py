@@ -1,9 +1,9 @@
 from setuptools import setup
 setup(name="espurna-dev-builder",
       version="1.0",
-      description="https://github.com/xoseperez/espurna dev branch builder",
+      description="ESPurna dev branch builder utility",
       author="Maxim Prokhorov",
-      license="GPL-3",
+      license="License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
       install_requires=[
           "requests"
       ],
