@@ -6,22 +6,31 @@ import sys
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main")
 
+from espurna_dev_builder.errors import Error
+
+def exc_handler(exc_type, exc_value, exc_trace):
+    if issubclass(exc_type, Error):
+        log.error("Exiting: \"{}\"".format(exc_value))
+    else:
+        log.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_trace))
+
+sys.excepthook = exc_handler
+
 from espurna_dev_builder.api import Repo, Api
 from espurna_dev_builder.prepare import prepare
 from espurna_dev_builder.mkenv import mkenv
 from espurna_dev_builder.setup_repo import setup_repo
-from espurna_dev_builder.errors import Error
 
 
 # TODO argparse?
 def get_env_config():
     token = os.environ.get("GITHUB_TOKEN")
     if not token:
-        raise ValueError("no token configured?")
+        raise Error("no token configured?")
 
     event = os.environ.get("TRAVIS_EVENT_TYPE")
     if not event:
-        raise ValueError("not in travis?")
+        raise Error("not in travis?")
 
     return token, event
 
