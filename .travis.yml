@@ -23,7 +23,7 @@ install:
     pip install .
     if [ ${TRAVIS_BUILD_STAGE_NAME} = "Test" ]; then
         python -mespurna_dev_builder prepare xoseperez/espurna mcspr/espurna-travis-test
-        exit 0
+        exit $?
     fi
     if [ ${TRAVIS_BUILD_STAGE_NAME} = "Release" ]; then
         python -mespurna_dev_builder mkenv mcspr/espurna-travis-test
