@@ -2,17 +2,19 @@ import os
 
 from espurna_dev_builder.util import git_head, nightly_tag
 
+VERSION_FMT = "{version}.nightly{tag}.git{sha}"
 
 # known pattern: '<mask>-<env>.bin'
 # '<mask>': 'espurna-<version>'
 # '<version>': '<major>.<minor>.<patch>[a-z]'
 def rename_file(filename, tag, sha):
     _before, version, _after = filename.split('-', 2)
-    version = "{version}.nightly{tag}.git{sha}".format(version=version, tag=tag, sha=sha)
+    version = VERSION_FMT.format(version=version, tag=tag, sha=sha)
     return '-'.join([_before, version, _after])
 
 
 def rename_releases(releases_dir):
+    """Search given directory for files and replace '<version>' in the name with '{}'""".format(VERSION_FMT)
     sha = git_head(short=True)
     tag = nightly_tag()
     masks = []
@@ -22,14 +24,11 @@ def rename_releases(releases_dir):
             masks = dirnames
             continue
 
-    # avoid recursive renaming by checking if filename already has ref
-    for filename in filenames:
-        for mask in masks:
-            if filename.startswith(mask) and not sha in filename:
-                new_filename = rename_file(filename, tag, sha)
-                old_path = os.path.join(releases_dir, mask, filename)
-                new_path = os.path.join(releases_dir, mask, new_filename)
-                print(old_path, new_path)
-                #os.rename(filename, 
-
-            
+        # avoid recursive renaming by checking if filename already has ref
+        for filename in filenames:
+            for mask in masks:
+                if filename.startswith(mask) and not sha in filename:
+                    new_filename = rename_file(filename, tag, sha)
+                    old_path = os.path.join(releases_dir, mask, filename)
+                    new_path = os.path.join(releases_dir, mask, new_filename)
+                    os.rename(old_path, new_path)
