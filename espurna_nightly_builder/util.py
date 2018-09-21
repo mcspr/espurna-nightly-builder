@@ -19,4 +19,3 @@ def git_head(short=False):
     if short:
         cmd.insert(-1, "--short")
     return run(cmd)
-

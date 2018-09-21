@@ -8,11 +8,13 @@ log = logging.getLogger("main")
 
 from espurna_nightly_builder.errors import Error
 
+
 def exc_handler(exc_type, exc_value, exc_trace):
     if issubclass(exc_type, Error):
-        log.error("Exiting: \"{}\"".format(exc_value))
+        log.error('Exiting: "{}"'.format(exc_value))
     else:
         log.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_trace))
+
 
 sys.excepthook = exc_handler
 
@@ -51,6 +53,7 @@ else:
     sys.exit(1)
 
 API = Api(TOKEN)
+
 
 def f_prepare(args):
     target_repo = Repo(args.target_repo, api=API)
@@ -97,8 +100,10 @@ def setup_argparse():
     cmd_mkenv.add_argument("builder_repo")
     cmd_mkenv.set_defaults(func=f_mkenv)
 
-    cmd_rename_releases = subparser.add_parser("rename_releases",
-            help="replace release files '{{version}}' string with '{}'".format(VERSION_FMT))
+    cmd_rename_releases = subparser.add_parser(
+        "rename_releases",
+        help="replace release files '{{version}}' string with '{}'".format(VERSION_FMT),
+    )
     cmd_rename_releases.add_argument("releases_dir")
     cmd_rename_releases.set_defaults(func=f_rename_releases)
 

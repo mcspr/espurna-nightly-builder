@@ -8,9 +8,9 @@ VERSION_FMT = "{version}.nightly{tag}.git{sha}"
 # '<mask>': 'espurna-<version>'
 # '<version>': '<major>.<minor>.<patch>[a-z]'
 def rename_file(filename, tag, sha):
-    _before, version, _after = filename.split('-', 2)
+    _before, version, _after = filename.split("-", 2)
     version = VERSION_FMT.format(version=version, tag=tag, sha=sha)
-    return '-'.join([_before, version, _after])
+    return "-".join([_before, version, _after])
 
 
 def rename_releases(releases_dir, fmt=VERSION_FMT):
