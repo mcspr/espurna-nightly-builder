@@ -31,13 +31,14 @@ def get_env_config():
         raise Error("no token configured?")
 
     event = os.environ.get("TRAVIS_EVENT_TYPE")
-    if not event:
+    repo = os.environ.get("TRAVIS_REPO_SLUG")
+    if not event or not repo:
         raise Error("not in travis?")
 
-    return token, event
+    return token, event, repo
 
 
-TOKEN, EVENT = get_env_config()
+TOKEN, EVENT, REPO = get_env_config()
 
 
 if EVENT == "cron":
@@ -89,7 +90,7 @@ def setup_argparse():
 
     cmd_prepare = subparser.add_parser("prepare", help=prepare.__doc__)
     cmd_prepare.add_argument("target_repo")
-    cmd_prepare.add_argument("builder_repo")
+    cmd_prepare.add_argument("builder_repo", default=REPO)
     cmd_prepare.set_defaults(func=f_prepare)
 
     cmd_mkenv = subparser.add_parser("mkenv", help=mkenv.__doc__)

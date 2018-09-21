@@ -22,11 +22,11 @@ install:
   - |
     pip install .
     if [ ${TRAVIS_BUILD_STAGE_NAME} = "Test" ]; then
-        espurna_nightly prepare xoseperez/espurna mcspr/espurna-travis-test
+        espurna_nightly prepare xoseperez/espurna
         exit $?
     fi
     if [ ${TRAVIS_BUILD_STAGE_NAME} = "Release" ]; then
-        espurna_nightly mkenv mcspr/espurna-travis-test
+        espurna_nightly mkenv
         source environment
     fi
   - git clone --branch dev --no-tags --single-branch --depth=1 https://github.com/xoseperez/espurna
