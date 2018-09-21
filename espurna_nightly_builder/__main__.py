@@ -105,8 +105,11 @@ def setup_argparse():
     cmd_rename_releases.add_argument("releases_dir")
     cmd_rename_releases.set_defaults(func=f_rename_releases)
 
+    return parser
+
 
 def main():
+    parser = setup_argparse()
     args = parser.parse_args()
     args.func(args)
 
