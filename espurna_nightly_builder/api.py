@@ -128,17 +128,19 @@ class Repo(object):
         )
         return (res["content"], res["commit"])
 
-    def release(self, tag, sha, body, prerelease=False):
+    def release(self, sha, tag, body, name=None, prerelease=False):
         path = self._base("releases")
-        res = self.api.post_json(
-            path,
-            data={
-                "tag_name": tag,
-                "target_commitish": sha,
-                "body": body,
-                "prerelease": prerelease,
-            },
-        )
+        data={
+            "tag_name": tag,
+            "target_commitish": sha,
+            "body": body,
+            "prerelease": prerelease,
+        }
+        if name:
+            data["name"] = name
+
+        res = self.api.post_json(path, data)
+
         return res
 
     # TODO tag object, not ref. does github display this ever?
