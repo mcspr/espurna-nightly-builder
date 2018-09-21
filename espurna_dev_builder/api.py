@@ -14,6 +14,7 @@ import requests
 log = logging.getLogger(__name__)
 
 
+# log sent requests. received data isn't shown
 def enable_requests_debug():
     import http.client
 
@@ -194,6 +195,7 @@ class Repo(object):
         return release
 
 
+# latest release will likely have same commit on both master (release branch) and dev
 def release_is_head(repo, head_sha):
     release = repo.latest_release()
     release_sha = release["sha"]

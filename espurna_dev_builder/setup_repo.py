@@ -3,6 +3,7 @@ import subprocess
 
 
 def setup_repo(branch, commit_filename):
+    """Initial setup for builder_branch. Required to run once before running prepare / check_release."""
     origin_url = subprocess.check_output(["git", "remote", "get-url", "origin"]).strip()
 
     os.mkdir(branch)
