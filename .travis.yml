@@ -56,7 +56,7 @@ deploy:
   release_number: ${TRAVIS_RELEASE_NUMBER}
   on:
     branch: builder
-    repo: mcspr/espurna-travis-test
+    repo: mcspr/espurna-nightly-builder
     condition: $TRAVIS_BUILD_STAGE_NAME = Release
 
 stages:
