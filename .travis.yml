@@ -44,7 +44,7 @@ install:
 #  - export TRAVIS_REPO_SLUG=mcspr/espurna
 
 before_deploy:
-    - bash rename_app_revision.sh
+    - python -mespurna_dev_builder rename_releases espurna/firmware
 
 deploy:
   provider: releases
