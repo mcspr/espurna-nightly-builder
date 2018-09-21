@@ -93,11 +93,11 @@ def setup_argparse():
 
     cmd_prepare = subparser.add_parser("prepare", help=prepare.__doc__)
     cmd_prepare.add_argument("target_repo")
-    cmd_prepare.add_argument("builder_repo", default=REPO)
+    cmd_prepare.add_argument("builder_repo", nargs='?', default=REPO)
     cmd_prepare.set_defaults(func=f_prepare)
 
     cmd_mkenv = subparser.add_parser("mkenv", help=mkenv.__doc__)
-    cmd_mkenv.add_argument("builder_repo")
+    cmd_mkenv.add_argument("builder_repo", nargs='?', default=REPO)
     cmd_mkenv.set_defaults(func=f_mkenv)
 
     cmd_rename_releases = subparser.add_parser(
