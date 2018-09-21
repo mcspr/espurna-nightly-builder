@@ -20,6 +20,7 @@ from espurna_dev_builder.api import Repo, Api
 from espurna_dev_builder.prepare import prepare
 from espurna_dev_builder.mkenv import mkenv
 from espurna_dev_builder.setup_repo import setup_repo
+from espurna_dev_builder.rename_releases import rename_releases
 
 
 # TODO argparse?
@@ -78,6 +79,10 @@ def f_setup_repo(args):
     setup_repo(branch=args.builder_branch, commit_filename=args.commit_filename)
 
 
+def f_rename_releases(args):
+    rename_releases(args.releases_dir)
+
+
 cmd_prepare = subparser.add_parser("prepare")
 cmd_prepare.add_argument("target_repo")
 cmd_prepare.add_argument("builder_repo")
@@ -89,6 +94,10 @@ cmd_mkenv.set_defaults(func=f_mkenv)
 
 cmd_setup_repo = subparser.add_parser("setup_repo")
 cmd_setup_repo.set_defaults(func=f_setup_repo)
-args = parser.parse_args()
 
+cmd_rename_releases = subparser.add_parser("rename_releases")
+cmd_rename_releases.add_argument("releases_dir")
+cmd_rename_releases.set_defaults(func=f_rename_releases)
+
+args = parser.parse_args()
 args.func(args)

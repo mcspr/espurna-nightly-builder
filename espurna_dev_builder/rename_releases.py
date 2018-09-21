@@ -1,0 +1,35 @@
+import os
+
+from espurna_dev_builder.util import git_head, nightly_tag
+
+
+# known pattern: '<mask>-<env>.bin'
+# '<mask>': 'espurna-<version>'
+# '<version>': '<major>.<minor>.<patch>[a-z]'
+def rename_file(filename, tag, sha):
+    _before, version, _after = filename.split('-', 2)
+    version = "{version}.nightly{tag}.git{sha}".format(version=version, tag=tag, sha=sha)
+    return '-'.join([_before, version, _after])
+
+
+def rename_releases(releases_dir):
+    sha = git_head(short=True)
+    tag = nightly_tag()
+    masks = []
+
+    for dirpath, dirnames, filenames in os.walk(releases_dir):
+        if dirpath == releases_dir:
+            masks = dirnames
+            continue
+
+    # avoid recursive renaming by checking if filename already has ref
+    for filename in filenames:
+        for mask in masks:
+            if filename.startswith(mask) and not sha in filename:
+                new_filename = rename_file(filename, tag, sha)
+                old_path = os.path.join(releases_dir, mask, filename)
+                new_path = os.path.join(releases_dir, mask, new_filename)
+                print(old_path, new_path)
+                #os.rename(filename, 
+
+            
