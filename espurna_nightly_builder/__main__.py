@@ -80,11 +80,13 @@ def f_rename_releases(args):
 
 def setup_argparse():
     parser = argparse.ArgumentParser()
-    subparser = parser.add_subparsers()
 
     parser.add_argument("--commit-filename", default="commit.txt")
     parser.add_argument("--target-branch", default="dev")
     parser.add_argument("--builder-branch", default="nightly")
+    parser.set_defaults(func=lambda _: parser.print_help())
+
+    subparser = parser.add_subparsers()
 
     cmd_setup_repo = subparser.add_parser("setup_repo", help=setup_repo.__doc__)
     cmd_setup_repo.set_defaults(func=f_setup_repo)
