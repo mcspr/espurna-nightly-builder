@@ -20,7 +20,7 @@ from espurna_dev_builder.api import Repo, Api
 from espurna_dev_builder.prepare import prepare
 from espurna_dev_builder.mkenv import mkenv
 from espurna_dev_builder.setup_repo import setup_repo
-from espurna_dev_builder.rename_releases import rename_releases
+from espurna_dev_builder.rename_releases import rename_releases, VERSION_FMT
 
 
 # TODO argparse?
@@ -83,19 +83,20 @@ def f_rename_releases(args):
     rename_releases(args.releases_dir)
 
 
-cmd_prepare = subparser.add_parser("prepare")
+cmd_setup_repo = subparser.add_parser("setup_repo", help=setup_repo.__doc__)
+cmd_setup_repo.set_defaults(func=f_setup_repo)
+
+cmd_prepare = subparser.add_parser("prepare", help=prepare.__doc__)
 cmd_prepare.add_argument("target_repo")
 cmd_prepare.add_argument("builder_repo")
 cmd_prepare.set_defaults(func=f_prepare)
 
-cmd_mkenv = subparser.add_parser("mkenv")
+cmd_mkenv = subparser.add_parser("mkenv", help=mkenv.__doc__)
 cmd_mkenv.add_argument("builder_repo")
 cmd_mkenv.set_defaults(func=f_mkenv)
 
-cmd_setup_repo = subparser.add_parser("setup_repo")
-cmd_setup_repo.set_defaults(func=f_setup_repo)
-
-cmd_rename_releases = subparser.add_parser("rename_releases")
+cmd_rename_releases = subparser.add_parser("rename_releases",
+        help="replace release files '{{version}}' string with '{}'".format(VERSION_FMT))
 cmd_rename_releases.add_argument("releases_dir")
 cmd_rename_releases.set_defaults(func=f_rename_releases)
 
