@@ -7,4 +7,10 @@ setup(name="espurna-nightly-builder",
       install_requires=[
           "requests"
       ],
-      packages=["espurna_nightly_builder"])
+      packages=["espurna_nightly_builder"],
+      entry_points={
+          "console_scripts": [
+              "espurna_nightly = espurna_nightly_builder.__main__:main"
+          ]
+      }
+)
