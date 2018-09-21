@@ -128,10 +128,16 @@ class Repo(object):
         )
         return (res["content"], res["commit"])
 
-    def release(self, tag, sha, body):
+    def release(self, tag, sha, body, prerelease=False):
         path = self._base("releases")
         res = self.api.post_json(
-            path, data={"tag_name": tag, "target_commitish": sha, "body": body}
+            path,
+            data={
+                "tag_name": tag,
+                "target_commitish": sha,
+                "body": body,
+                "prerelease": prerelease,
+            },
         )
         return res
 

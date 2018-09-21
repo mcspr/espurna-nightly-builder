@@ -44,5 +44,8 @@ def prepare(
     _, builder_commit = builder_repo.update_file(builder_branch, commit_file, msg)
 
     builder_repo.release(
-        tag, builder_commit["sha"], target_repo.compare_url(old_sha, head_sha)
+        tag,
+        builder_commit["sha"],
+        target_repo.compare_url(old_sha, head_sha),
+        prerelease=True,
     )
