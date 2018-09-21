@@ -1,9 +1,9 @@
 import time
 import logging
 
-from espurna_dev_builder import errors
-from espurna_dev_builder.api import release_is_head
-from espurna_dev_builder.util import nightly_tag
+from espurna_nightly_builder import errors
+from espurna_nightly_builder.api import release_is_head
+from espurna_nightly_builder.util import nightly_tag
 
 log = logging.getLogger(__name__)
 

@@ -6,7 +6,7 @@ import sys
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("main")
 
-from espurna_dev_builder.errors import Error
+from espurna_nightly_builder.errors import Error
 
 def exc_handler(exc_type, exc_value, exc_trace):
     if issubclass(exc_type, Error):
@@ -16,11 +16,11 @@ def exc_handler(exc_type, exc_value, exc_trace):
 
 sys.excepthook = exc_handler
 
-from espurna_dev_builder.api import Repo, Api
-from espurna_dev_builder.prepare import prepare
-from espurna_dev_builder.mkenv import mkenv
-from espurna_dev_builder.setup_repo import setup_repo
-from espurna_dev_builder.rename_releases import rename_releases, VERSION_FMT
+from espurna_nightly_builder.api import Repo, Api
+from espurna_nightly_builder.prepare import prepare
+from espurna_nightly_builder.mkenv import mkenv
+from espurna_nightly_builder.setup_repo import setup_repo
+from espurna_nightly_builder.rename_releases import rename_releases, VERSION_FMT
 
 
 # TODO argparse?

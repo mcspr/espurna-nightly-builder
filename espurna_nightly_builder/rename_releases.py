@@ -1,6 +1,6 @@
 import os
 
-from espurna_dev_builder.util import git_head, nightly_tag
+from espurna_nightly_builder.util import git_head, nightly_tag
 
 VERSION_FMT = "{version}.nightly{tag}.git{sha}"
 
