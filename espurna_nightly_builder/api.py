@@ -129,7 +129,7 @@ class Repo(object):
 
     def release(self, sha, tag, body, name=None, prerelease=False):
         path = self._base("releases")
-        data={
+        data = {
             "tag_name": tag,
             "target_commitish": sha,
             "body": body,

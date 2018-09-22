@@ -15,7 +15,7 @@ def rename_file(filename, tag, sha):
 
 def rename_releases(releases_dir, fmt=VERSION_FMT):
     """Search given directory for files and replace '<version>' in the name with given '<fmt>'"""
-    sha = git_head(short=True)
+    sha = git_head(short=True, cwd=releases_dir)
     tag = nightly_tag()
     masks = []
 

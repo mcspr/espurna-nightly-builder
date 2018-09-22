@@ -14,8 +14,8 @@ def nightly_tag():
     return time.strftime("%Y%m%d")
 
 
-def git_head(short=False):
+def git_head(short=False, cwd=None):
     cmd = ["git", "rev-parse", "HEAD"]
     if short:
         cmd.insert(-1, "--short")
-    return run(cmd)
+    return run(cmd=cmd, cwd=cwd)
