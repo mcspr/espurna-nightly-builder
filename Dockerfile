@@ -3,9 +3,12 @@ FROM bitnami/minideb:stretch as installer
 FROM debian:buster-slim as ghr
 
 COPY --from=installer /usr/sbin/install_packages /usr/sbin/install_packages
-RUN install_packages git wget ca-certificates g++ gcc libc6-dev make pkg-config && \
-    wget -O go.tgz "https://golang.org/dl/go1.10.3.linux-amd64.tar.gz" && \
-    tar -C /usr/local -xzf go.tgz && \
+ARG GO_VERSION=1.11
+ARG GO_SHA256=b3fcf280ff86558e0559e185b601c9eade0fd24c900b4c63cd14d1d38613e499
+ADD "https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz" go.tar.gz
+RUN echo "${GO_SHA256} go.tar.gz" | sha256sum -c -
+RUN install_packages git ca-certificates g++ gcc libc6-dev make pkg-config && \
+    tar -C /usr/local -xzf go.tar.gz && \
     mkdir -p /go/src /go/bin && chmod -R 777 /go && \
     GOPATH=/go /usr/local/go/bin/go get -u github.com/tcnksm/ghr
 
