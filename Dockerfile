@@ -26,11 +26,9 @@ RUN groupadd --gid 1000 worker && \
         --shell /bin/bash \
         --create-home worker
 
-RUN install_packages python-minimal libpython2.7-stdlib ca-certificates git xz-utils wget gnupg apt-transport-https && \
-    wget https://bootstrap.pypa.io/get-pip.py && \
-    python2.7 get-pip.py && \
+RUN install_packages python2-minimal python-setuptools ca-certificates git xz-utils wget gnupg apt-transport-https && \
+    python2.7 -measy_install pip && \
     pip install virtualenv && \
-    rm get-pip.py && \
     wget https://deb.nodesource.com/gpgkey/nodesource.gpg.key && \
     apt-key add nodesource.gpg.key && \
     rm nodesource.gpg.key && \
