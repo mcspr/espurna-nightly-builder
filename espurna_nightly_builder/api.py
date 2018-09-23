@@ -103,6 +103,12 @@ class Repo(object):
     def _base(self, path):
         return "{}/{}".format(self.base, path)
 
+    @property
+    def clone_url(self):
+        return "https://github.com/{owner}/{name}.git".format(
+            owner=self.owner, name=self.name
+        )
+
     def compare_url(self, start, end):
         url = "https://github.com/{owner}/{name}/compare/{start}...{end}".format(
             owner=self.owner, name=self.name, start=start, end=end

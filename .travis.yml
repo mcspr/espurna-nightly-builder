@@ -26,10 +26,16 @@ install:
         exit $?
     fi
     if [ ${TRAVIS_BUILD_STAGE_NAME} = "Release" ]; then
-        espurna_nightly mkenv
+        espurna_nightly mkenv xoseperez/espurna
         source environment
     fi
-  - git clone --branch dev --no-tags --single-branch --depth=1 https://github.com/xoseperez/espurna
+  - |
+    git init espurna
+    pushd espurna
+    git remote add origin ${NIGHTLY_TARGET_REPO_URL}
+    git fetch --depth=1 origin ${NIGHTLY_COMMIT_SHA}
+    git checkout FETCH_HEAD
+    popd
   - |
     pushd espurna/code
     pip install -U platformio
@@ -44,7 +50,7 @@ install:
 #  - export TRAVIS_REPO_SLUG=mcspr/espurna
 
 before_deploy:
-    - espurna_nightly rename_releases espurna/firmware
+    - espurna_nightly rename_releases --sha ${NIGHTLY_COMMIT_SHA} espurna/firmware
 
 deploy:
   provider: releases
@@ -53,7 +59,7 @@ deploy:
   file: espurna/firmware/**/*
   overwrite: true
   skip_cleanup: true
-  release_number: ${TRAVIS_RELEASE_NUMBER}
+  release_number: ${NIGHTLY_RELEASE_NUMBER}
   on:
     branch: builder
     repo: mcspr/espurna-nightly-builder

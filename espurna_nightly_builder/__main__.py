@@ -23,10 +23,10 @@ from espurna_nightly_builder.prepare import prepare
 from espurna_nightly_builder.mkenv import mkenv
 from espurna_nightly_builder.setup_repo import setup_repo
 from espurna_nightly_builder.rename_releases import rename_releases, VERSION_FMT
+from espurna_nightly_builder.util import nightly_tag
 
 
 # TODO argparse?
-# TODO TRAVIS_REPO_SLUG too?
 def get_env_config():
     token = os.environ.get("GITHUB_TOKEN")
     if not token:
@@ -66,8 +66,9 @@ def f_prepare(args):
 
 
 def f_mkenv(args):
+    target_repo = Repo(args.target_repo, api=API)
     builder_repo = Repo(args.builder_repo, api=API)
-    mkenv(builder_repo)
+    mkenv(target_repo, builder_repo)
 
 
 def f_setup_repo(args):
@@ -75,7 +76,7 @@ def f_setup_repo(args):
 
 
 def f_rename_releases(args):
-    rename_releases(args.releases_dir)
+    rename_releases(args.releases_dir, nightly_tag(), args.sha)
 
 
 def setup_argparse():
@@ -93,17 +94,19 @@ def setup_argparse():
 
     cmd_prepare = subparser.add_parser("prepare", help=prepare.__doc__)
     cmd_prepare.add_argument("target_repo")
-    cmd_prepare.add_argument("builder_repo", nargs='?', default=REPO)
+    cmd_prepare.add_argument("builder_repo", nargs="?", default=REPO)
     cmd_prepare.set_defaults(func=f_prepare)
 
     cmd_mkenv = subparser.add_parser("mkenv", help=mkenv.__doc__)
-    cmd_mkenv.add_argument("builder_repo", nargs='?', default=REPO)
+    cmd_mkenv.add_argument("target_repo")
+    cmd_mkenv.add_argument("builder_repo", nargs="?", default=REPO)
     cmd_mkenv.set_defaults(func=f_mkenv)
 
     cmd_rename_releases = subparser.add_parser(
         "rename_releases",
         help="replace release files '{{version}}' string with '{}'".format(VERSION_FMT),
     )
+    cmd_rename_releases.add_argument("--sha")
     cmd_rename_releases.add_argument("releases_dir")
     cmd_rename_releases.set_defaults(func=f_rename_releases)
 
