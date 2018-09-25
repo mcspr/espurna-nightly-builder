@@ -103,6 +103,11 @@ class Repo(object):
     def _base(self, path):
         return "{}/{}".format(self.base, path)
 
+    def tags(self):
+        path = self._base("tags")
+        res = self.api.get_json(path)
+        return res
+
     @property
     def clone_url(self):
         return "https://github.com/{owner}/{name}.git".format(

@@ -84,6 +84,11 @@ def f_rename_releases(args):
     rename_releases(args.releases_dir, nightly_tag(), args.sha)
 
 
+def f_list_tags(args):
+    builder_repo = Repo(args.builder_repo, api=API)
+    log.info("tags:\n%s", "\n".join([tag["name"] for tag in builder_repo.tags()]))
+
+
 def setup_argparse():
     parser = argparse.ArgumentParser()
 
@@ -114,6 +119,10 @@ def setup_argparse():
     cmd_rename_releases.add_argument("--sha")
     cmd_rename_releases.add_argument("releases_dir")
     cmd_rename_releases.set_defaults(func=f_rename_releases)
+
+    cmd_list_tags = subparser.add_parser("list_tags")
+    cmd_list_tags.add_argument("builder_repo", nargs="?", default=REPO)
+    cmd_list_tags.set_defaults(func=f_list_tags)
 
     return parser
 
