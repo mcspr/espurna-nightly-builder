@@ -48,7 +48,7 @@ def f_prepare(args):
     if EVENT == "cron":
         log.info("Starting nightly builder checks")
     elif EVENT == "api":
-        log.error("Continuing to the next stage")
+        log.info("Continuing to the next stage")
         sys.exit(0)
     else:
         log.error("Unknown travis event type")
