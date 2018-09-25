@@ -10,9 +10,10 @@ def mkenv(
     """Preserve github's release unique id."""
 
     url = target_repo.clone_url
-    number = release["number"]
 
     release = builder_repo.latest_release()
+    number = release["number"]
+
     commit_file = builder_repo.file(builder_branch, commit_filename)
     sha = commit_file.content
 
