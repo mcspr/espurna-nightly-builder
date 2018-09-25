@@ -4,14 +4,17 @@ log = logging.getLogger(__name__)
 
 
 # TODO just print this? check if env is preserved between script groups (gitlab especially)
-def mkenv(target_repo, builder_repo):
+def mkenv(
+    target_repo, builder_repo, builder_branch="nightly", commit_filename="commit.txt"
+):
     """Preserve github's release unique id."""
 
-    release = builder_repo.latest_release()
     url = target_repo.clone_url
-
     number = release["number"]
-    sha = release["sha"]
+
+    release = builder_repo.latest_release()
+    commit_file = builder_repo.file(builder_branch, commit_filename)
+    sha = commit_file.content
 
     log.info("release for %s - {number:%d sha:%s}", url, number, sha)
 

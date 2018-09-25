@@ -68,7 +68,12 @@ def f_prepare(args):
 def f_mkenv(args):
     target_repo = Repo(args.target_repo, api=API)
     builder_repo = Repo(args.builder_repo, api=API)
-    mkenv(target_repo, builder_repo)
+    mkenv(
+        target_repo,
+        builder_repo,
+        builder_branch=args.builder_branch,
+        commit_filename=args.commit_filename,
+    )
 
 
 def f_setup_repo(args):

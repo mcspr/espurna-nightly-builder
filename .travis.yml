@@ -1,5 +1,4 @@
 sudo: false
-conditions: v1
 language: python
 python:
 - '2.7'
@@ -19,6 +18,7 @@ cache:
 
 install:
   - env | grep TRAVIS
+  - set -e
   - |
     pip install .
     if [ ${TRAVIS_BUILD_STAGE_NAME} = "Test" ]; then
@@ -44,10 +44,7 @@ install:
         npm install --only=dev
     fi
     popd
-
-# XXX override deploy target repo XXX
-#before_deploy:
-#  - export TRAVIS_REPO_SLUG=mcspr/espurna
+  - set +e
 
 before_deploy:
     - espurna_nightly rename_releases --sha ${NIGHTLY_COMMIT_SHA} espurna/firmware
