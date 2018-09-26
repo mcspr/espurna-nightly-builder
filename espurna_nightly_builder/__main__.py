@@ -81,7 +81,12 @@ def f_setup_repo(args):
 
 
 def f_rename_releases(args):
-    rename_releases(args.releases_dir, nightly_tag(), args.sha)
+    rename_releases(
+        releases_dir=args.releases_dir,
+        version_template=args.version,
+        tag=nightly_tag(),
+        sha=args.sha,
+    )
 
 
 def f_list_tags(args):
@@ -114,9 +119,10 @@ def setup_argparse():
 
     cmd_rename_releases = subparser.add_parser(
         "rename_releases",
-        help="replace release files '{{version}}' string with '{}'".format(VERSION_FMT),
+        help="format release files '{{version}}' string with '--version' value",
     )
     cmd_rename_releases.add_argument("--sha")
+    cmd_rename_releases.add_argument("--version", default=VERSION_FMT)
     cmd_rename_releases.add_argument("releases_dir")
     cmd_rename_releases.set_defaults(func=f_rename_releases)
 
