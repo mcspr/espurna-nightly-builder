@@ -14,11 +14,12 @@ cache:
   - ${HOME}/.cache/pip
   - ${HOME}/.platformio
   - ${HOME}/pio-libdeps
-  - ${HOME}/espurna/code/node_modules
 
 install:
   - env | grep TRAVIS
   - set -e
+  - pip install -U platformio
+  - npm install -g npm@latest
   - |
     pip install .
     if [ ${TRAVIS_BUILD_STAGE_NAME} = "Test" ]; then
@@ -38,11 +39,7 @@ install:
     popd
   - |
     pushd espurna/code
-    pip install -U platformio
-    mkdir -p node_modules
-    if [ ! -e node_modules/gulp/bin/gulp.js ] ; then
-        npm install --only=dev
-    fi
+    npm ci
     popd
   - set +e
 
