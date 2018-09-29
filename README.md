@@ -1,12 +1,42 @@
-### Nightly build?
-https://en.wikipedia.org/wiki/Neutral_build
-> In software development, a neutral build is a software build that reflects the current state of the source code checked into the source code version control system by the developers, and done in a neutral environment (an environment not used for development).  
+[![latest release](https://img.shields.io/github/release/mcspr/espurna-nightly-builder.svg?label=Latest%20Release)](https://github.com/mcspr/espurna-nightly-builder/releases/latest)  
+[travis-ci.org build logs](https://travis-ci.org/mcspr/espurna-nightly-builder/builds)
 
-> A nightly build is a neutral build that takes place automatically. These typically take place when no one is likely to be working in the office so that there are no changes to the source code during the build. The results of the build are inspected by the arriving programmers, who generally place a priority on ensuring the recent changes to the source code have not broken the build process or functionality of the software. Nightly builds also ensure that the build tools have not broken due to system updates, and are therefore often run whether any source code has changed or not.
+# Nightly build?
 
-### Where are .bin files?
-See [Releases](https://github.com/mcspr/espurna-nightly-builder/releases) section
+This repo is used to build binary release of the latest [ESPurna](https://github.com/xoseperez/espurna)'s [`dev`](https://github.com/xoseperez/espurna/tree/dev) branch commit on a daily basis. Build starts every day at **04:10 UTC** using the [Travis CI Cron](https://docs.travis-ci.com/user/cron-jobs/). If there were no new commits since the latest release, build process will not create a new one.
 
-### When does the build start?
-Every day at **04:10 UTC**  
-See [travis-ci.org build logs](https://travis-ci.org/mcspr/espurna-nightly-builder/builds)
+# Technical info
+
+> Note: See [espurna_nightly_builder](https://github.com/mcspr/espurna-nightly-builder/tree/builder/espurna_nightly_builder) and [.travis.yml](https://github.com/mcspr/espurna-nightly-builder/blob/builder/.travis.yml) scripts.
+
+Build process is split into 2 stages - Test and Release.
+
+## Test
+
+This stage performs multiple tests and stops the build when they fail.
+- Build can be triggered either from Cron or through Travis CI API. Following tests will run only when triggered from Cron. API will start building immediately.
+- CI test status of the latest 'dev' commit. If testing fails, full release is likely to fail too.
+- If 'master' branch has the same commit as 'dev'. This will happen when official release has been made. If yes - there is no need to repeat build here.
+- Compare contents of 'commit.txt' file on the 'nightly' branch and sha value of the latest 'dev' branch commit. To avoid repeated builds it will stop build process when they are the same. 
+
+Finally, sha value of the latest 'dev' branch commit is added to the 'nightly' branch via plain text file 'commit.txt'. Then, new release is created for that commit. This automatically tags the commit and creates release in the 'Releases' section.
+
+## Release
+
+This stage runs the same build.sh script that is used to build official releases. Only difference is — after it is done, files are renamed to include current date (tag of the release) and git sha value ('commit.txt' contents from the previous stage).
+
+# GitLab
+
+> Incomplete and not working right now
+
+[.gitlab-ci.yml](https://github.com/mcspr/espurna-nightly-builder/blob/builder/.gitlab-ci.yml) uses the same process as Travis build script, but with notable differences:
+- Custom container image (see [Dockerfile](https://github.com/mcspr/espurna-nightly-builder/blob/builder/Dockerfile)) is used
+- It is pretending to be Travis for [build.sh](https://github.com/mcspr/espurna-nightly-builder/blob/f702837ed95bf1174584269e7fd6f75fe4acf85c/.gitlab-ci.yml#L65)
+- [Build takes more time than travis](https://gitlab.com/mcspr/espurna-travis-test/pipelines/25418527)
+
+# TODO
+
+- [ ] GitHub commit status / GitHub Checks
+- [ ] Hide releases until build is complete
+- [ ] Redo build completely when triggered by API (remove tag, release and it's assets)
+- [ ] GitLab integration
