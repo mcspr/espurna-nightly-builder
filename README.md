@@ -1,5 +1,5 @@
-[![latest release tag](https://img.shields.io/github/release/mcspr/espurna-nightly-builder/all.svg?label=Latest%20release)](https://github.com/mcspr/espurna-nightly-builder/releases/latest)
-[![latest release date](https://img.shields.io/github/release-date-pre/mcspr/espurna-nightly-builder.svg)](https://github.com/mcspr/espurna-nightly-builder/releases/latest)  
+[![latest release tag](https://img.shields.io/github/release/mcspr/espurna-nightly-builder/all.svg?label=Latest%20release)](https://github.com/mcspr/espurna-nightly-builder/releases)
+[![latest release date](https://img.shields.io/github/release-date-pre/mcspr/espurna-nightly-builder.svg)](https://github.com/mcspr/espurna-nightly-builder/releases)  
 [travis-ci.org build logs](https://travis-ci.org/mcspr/espurna-nightly-builder/builds)
 
 # Nightly build?
@@ -18,13 +18,13 @@ This stage performs multiple tests and stops the build when they fail.
 - Build can be triggered either from Cron or through Travis CI API. Following tests will run only when triggered from Cron. API will start building immediately.
 - CI test status of the latest 'dev' commit. If testing fails, full release is likely to fail too.
 - If 'master' branch has the same commit as 'dev'. This will happen when official release has been made. If yes - there is no need to repeat build here.
-- Compare contents of 'commit.txt' file on the 'nightly' branch and sha value of the latest 'dev' branch commit. To avoid repeated builds it will stop build process when they are the same. 
+- Compare contents of 'commit.txt' file on the 'nightly' branch and SHA hash value of the latest 'dev' branch commit. To avoid repeated builds it will stop build process when they are the same. 
 
-Finally, sha value of the latest 'dev' branch commit is added to the 'nightly' branch via plain text file 'commit.txt'. Then, new release is created for that commit. This automatically tags the commit and creates release in the 'Releases' section.
+Finally, SHA value of the latest 'dev' branch commit is added to the 'nightly' branch via plain text file 'commit.txt'. Then, new release is created for that commit. This automatically tags the commit and creates release in the 'Releases' section.
 
 ## Release
 
-This stage runs the same build.sh script that is used to build official releases. Only difference is — after it is done, files are renamed to include current date (tag of the release) and git sha value ('commit.txt' contents from the previous stage).
+This stage runs the same build.sh script that is used to build official releases. Only difference is — after it is done, files are renamed to include current date (tag of the release) and git SHA hash value ('commit.txt' contents from the previous stage).
 
 # GitLab
 
