@@ -1,14 +1,14 @@
+# ESPurna Nightly Builder
 [![latest release tag](https://img.shields.io/github/release/mcspr/espurna-nightly-builder/all.svg?label=Latest%20release)](https://github.com/mcspr/espurna-nightly-builder/releases)
-[![latest release date](https://img.shields.io/github/release-date-pre/mcspr/espurna-nightly-builder.svg)](https://github.com/mcspr/espurna-nightly-builder/releases)  
 [travis-ci.org build logs](https://travis-ci.org/mcspr/espurna-nightly-builder/builds)
 
 # Nightly build?
 
-This repo is used to build binary release of the latest [ESPurna](https://github.com/xoseperez/espurna)'s [`dev`](https://github.com/xoseperez/espurna/tree/dev) branch commit on a daily basis. Build starts every day at **04:10 UTC** using the [Travis CI Cron](https://docs.travis-ci.com/user/cron-jobs/). If there were no new commits since the latest release, build process will not create a new one.
+This repo is used to build binary release of [ESPurna](https://github.com/xoseperez/espurna), every night at **04:10 UTC**  
+Unlike official releases, binaries are created from latest commit to the [`dev`](https://github.com/xoseperez/espurna/tree/dev) branch.
 
 # Technical info
-
-> Note: See [espurna_nightly_builder](https://github.com/mcspr/espurna-nightly-builder/tree/builder/espurna_nightly_builder) and [.travis.yml](https://github.com/mcspr/espurna-nightly-builder/blob/builder/.travis.yml) scripts.
+[Travis CI Cron](https://docs.travis-ci.com/user/cron-jobs/) is used to trigger the build. See [.travis.yml](https://github.com/mcspr/espurna-nightly-builder/blob/builder/.travis.yml) and [espurna_nightly_builder](https://github.com/mcspr/espurna-nightly-builder/tree/builder/espurna_nightly_builder) scripts.
 
 Build process is split into 2 stages - Test and Release.
 
@@ -37,7 +37,8 @@ This stage runs the same build.sh script that is used to build official releases
 
 # TODO
 
-- [ ] GitHub commit status / GitHub Checks
+- [ ] GitHub commit status / GitHub Checks for 'nightly' branch
+- [ ] Hide commit status for 'builder' branch
 - [ ] Hide releases until build is complete
 - [ ] Redo build completely when triggered by API (remove tag, release and it's assets)
 - [ ] GitLab integration
