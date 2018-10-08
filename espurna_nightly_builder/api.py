@@ -114,12 +114,6 @@ class Repo(object):
             owner=self.owner, name=self.name
         )
 
-    def compare_url(self, start, end):
-        url = "https://github.com/{owner}/{name}/compare/{start}...{end}".format(
-            owner=self.owner, name=self.name, start=start, end=end
-        )
-        return url
-
     def file(self, ref, filepath):
         path = self._base("contents/{}".format(filepath))
         res = self.api.get_json(path, params={"ref": ref})

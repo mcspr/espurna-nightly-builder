@@ -19,3 +19,10 @@ def git_head(short=False, cwd=None):
     if short:
         cmd.insert(-1, "--short")
     return run(cmd=cmd, cwd=cwd)
+
+
+def compare_url(repo, start, end):
+    url = "https://github.com/{owner}/{name}/compare/{start}...{end}".format(
+        owner=repo.owner, name=repo.name, start=start, end=end
+    )
+    return url

@@ -3,7 +3,7 @@ import logging
 
 from espurna_nightly_builder import errors
 from espurna_nightly_builder.api import release_is_head
-from espurna_nightly_builder.util import nightly_tag
+from espurna_nightly_builder.util import nightly_tag, compare_url
 
 log = logging.getLogger(__name__)
 
@@ -47,6 +47,6 @@ def prepare(
         tag=tag,
         name=msg,
         sha=builder_commit["sha"],
-        body=target_repo.compare_url(old_sha, head_sha),
+        body=compare_url(target_repo, old_sha, head_sha),
         prerelease=True,
     )
