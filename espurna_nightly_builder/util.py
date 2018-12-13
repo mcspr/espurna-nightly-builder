@@ -1,5 +1,6 @@
 import sys
 import time
+import datetime
 from subprocess import check_output
 
 
@@ -26,3 +27,11 @@ def compare_url(repo, start, end):
         owner=repo.owner, name=repo.name, start=start, end=end
     )
     return url
+
+
+def last_month_prefix():
+    date = datetime.datetime.utcnow()
+    delta = datetime.timedelta(1)
+    last = date.replace(day=1) - delta
+
+    return last.strftime("%Y%m")

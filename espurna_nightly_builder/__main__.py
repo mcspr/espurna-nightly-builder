@@ -3,7 +3,9 @@ import logging
 import os
 import sys
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO, format="%(relativeCreated)6d %(levelname)-8s %(message)s"
+)
 log = logging.getLogger("main")
 
 from espurna_nightly_builder.errors import Error
@@ -23,7 +25,7 @@ from espurna_nightly_builder.prepare import prepare
 from espurna_nightly_builder.mkenv import mkenv
 from espurna_nightly_builder.setup_repo import setup_repo
 from espurna_nightly_builder.rename_releases import rename_releases, VERSION_FMT
-from espurna_nightly_builder.util import nightly_tag
+from espurna_nightly_builder.util import nightly_tag, last_month_prefix
 
 
 # TODO argparse?
@@ -91,7 +93,36 @@ def f_rename_releases(args):
 
 def f_list_tags(args):
     builder_repo = Repo(args.builder_repo, api=API)
-    log.info("tags:\n%s", "\n".join([tag["name"] for tag in builder_repo.tags()]))
+
+    tags = builder_repo.tags()
+    log.info("tags:\n%s", "\n".join([tag["name"] for tag in tags]))
+
+
+def f_delete_releases(args):
+    builder_repo = Repo(args.builder_repo, api=API)
+
+    prefix = args.prefix
+
+    tags = builder_repo.tags()
+
+    releases = builder_repo.releases(last=len(tags))
+    releases = [
+        release
+        for release in releases
+        if (release["tagName"] and release["tagName"].startswith(prefix))
+        or "untagged" in release["url"]
+    ]
+
+    for release in releases:
+        log.info("tagName:%(tagName)s number:%(number)d", release)
+        if builder_repo.delete_release(release["number"]):
+            log.info("deleted release")
+        else:
+            log.error("could not delete the release")
+        if builder_repo.delete_tag(release["tagName"]):
+            log.info("deleted tag")
+        else:
+            log.error("could not delete the tag")
 
 
 def setup_argparse():
@@ -129,6 +160,11 @@ def setup_argparse():
     cmd_list_tags = subparser.add_parser("list_tags")
     cmd_list_tags.add_argument("builder_repo", nargs="?", default=REPO)
     cmd_list_tags.set_defaults(func=f_list_tags)
+
+    cmd_list_tags = subparser.add_parser("delete_releases")
+    cmd_list_tags.add_argument("--prefix", default=last_month_prefix())
+    cmd_list_tags.add_argument("builder_repo", nargs="?", default=REPO)
+    cmd_list_tags.set_defaults(func=f_delete_releases)
 
     return parser
 

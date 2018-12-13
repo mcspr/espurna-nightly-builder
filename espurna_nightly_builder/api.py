@@ -81,6 +81,11 @@ class Api(object):
         res = self._http.post(url, json=data, headers=None)
         return res.json()
 
+    def delete(self, path, params=None, headers=None):
+        url = urljoin(self.BASE_REST, path)
+        res = self._http.delete(url, params=params, headers=headers)
+        return res
+
     def graphql_query(self, query):
         data = json.dumps({"query": query})
         res = self._http.post(self.BASE_GRAPHQL, data=data)
@@ -132,7 +137,19 @@ class Repo(object):
         )
         return (res["content"], res["commit"])
 
-    def release(self, sha, tag, body, name=None, prerelease=False):
+    def delete_tag(self, tagName):
+        path = self._base("git/refs/tags/{}".format(tagName))
+        res = self.api.delete(path)
+
+        return res.status_code == 204
+
+    def delete_release(self, number):
+        path = self._base("releases/{}".format(number))
+        res = self.api.delete(path)
+
+        return res.status_code == 204
+
+    def create_release(self, sha, tag, body, name=None, prerelease=False):
         path = self._base("releases")
         data = {
             "tag_name": tag,
@@ -166,19 +183,17 @@ class Repo(object):
         res = self.api.get_json(path)
         return res["commit"]["sha"]
 
-    # TODO find lib that does both api v3 and v4?
-    # v4: graphql returns MUCH less data.
-    # v3: /releases/latest also contains assets, which we don't need
-    def latest_release(self):
+    def releases(self, last=1):
         query = """
         query {
-            repository(owner:\"OWNER\", name:\"NAME\") {
-                releases(last:1) {
+            repository(owner:"OWNER", name:"NAME") {
+                releases(last:LAST) {
                     nodes {
                         id
                         url
                         publishedAt
                         tag {
+                            name
                             target {
                                 oid
                                 commitUrl
@@ -188,23 +203,38 @@ class Repo(object):
                 }
             }
         }"""
-        query = query.replace("OWNER", self.owner).replace("NAME", self.name).strip()
+        query = (
+            query.replace("OWNER", self.owner)
+            .replace("NAME", self.name)
+            .replace("LAST", str(last))
+            .strip()
+        )
 
         res = self.api.graphql_query(query)
-        (release,) = res["data"]["repository"]["releases"]["nodes"]
+        releases = res["data"]["repository"]["releases"]["nodes"]
 
-        # XXX is this reliable?
-        id = release["id"]
-        del release["id"]
-        id = base64.b64decode(id.encode("ascii")).decode("ascii")
-        number = id.partition("Release")[-1]
-        release["number"] = int(number)
+        for release in releases:
+            # XXX is this reliable?
+            id = release["id"]
+            del release["id"]
+            id = base64.b64decode(id.encode("ascii")).decode("ascii")
+            number = id.partition("Release")[-1]
+            release["number"] = int(number)
 
-        sha = release["tag"]["target"]["oid"]
-        del release["tag"]
-        release["sha"] = sha
+            if release["tag"]:
+                sha = release["tag"]["target"]["oid"]
+                tag = release["tag"]["name"]
+                del release["tag"]
+                release["tagName"] = tag
+                release["sha"] = sha
+            else:
+                release["sha"] = None
+                release["tagName"] = None
 
-        return release
+        return releases
+
+    def latest_release(self):
+        return releases(last=1)[0]
 
 
 # latest release will likely have same commit on both master (release branch) and dev

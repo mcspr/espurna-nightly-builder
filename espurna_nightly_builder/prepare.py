@@ -43,7 +43,7 @@ def prepare(
     msg = "Nightly build ({})".format(tag)
     _, builder_commit = builder_repo.update_file(builder_branch, commit_file, msg)
 
-    builder_repo.release(
+    builder_repo.create_release(
         tag=tag,
         name=msg,
         sha=builder_commit["sha"],
