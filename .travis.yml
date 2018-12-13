@@ -64,7 +64,10 @@ stages:
     if: type IN (cron, api)
 
 script:
-  - pushd espurna/code && bash build.sh -p && popd
+  - |
+    pushd espurna/code
+    TRAVIS_COMMIT=$NIGHTLY_COMMIT_SHA ./build.sh -p
+    popd
 
 jobs:
   include:
