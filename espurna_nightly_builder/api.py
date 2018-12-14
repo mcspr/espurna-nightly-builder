@@ -234,7 +234,7 @@ class Repo(object):
         return releases
 
     def latest_release(self):
-        return releases(last=1)[0]
+        return self.releases(last=1)[0]
 
 
 # latest release will likely have same commit on both master (release branch) and dev
