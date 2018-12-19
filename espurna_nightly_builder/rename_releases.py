@@ -2,15 +2,16 @@ import os
 
 from espurna_nightly_builder.util import git_head, nightly_tag
 
-VERSION_FMT = "{version}.nightly{tag}.git{sha:.8}"
+VERSION_FMT = "{version}.nightly{tag}+git{sha:.8}"
 
 # known pattern: '<mask>-<env>.bin'
-# '<mask>': 'espurna-<version>'
-# '<version>': '<major>.<minor>.<patch>[a-z]'
+# '<mask>': 'espurna-<version>-<build>'
+# '<version>': '<major>.<minor>.<patch>[a-z]-<build>'
+# '<build>': '-...' or nothing
 def format_filename(filename, template, **template_kv):
-    _before, version, _after = filename.split("-", 2)
+    _before, _, version = filename.partition("-")
     version = template.format(version=version, **template_kv)
-    return "-".join([_before, version, _after])
+    return "-".join([_before, version])
 
 
 def rename_releases(releases_dir, version_template=VERSION_FMT, **template_kv):
