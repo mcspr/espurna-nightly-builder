@@ -8,10 +8,10 @@ VERSION_FMT = "{version}.nightly{tag}+git{sha:.8}"
 # '<mask>': 'espurna-<version>-<build>'
 # '<version>': '<major>.<minor>.<patch>[a-z]-<build>'
 # '<build>': '-...' or nothing
-def format_filename(filename, template, **template_kv):
-    _before, _, version = filename.partition("-")
+def format_filename(filename, mask, template, **template_kv):
+    _before, _, version = mask.partition("-")
     version = template.format(version=version, **template_kv)
-    return "-".join([_before, version])
+    return filename.replace(mask, version)
 
 
 def rename_releases(releases_dir, version_template=VERSION_FMT, **template_kv):
@@ -38,7 +38,7 @@ def rename_releases(releases_dir, version_template=VERSION_FMT, **template_kv):
                 if not filename.startswith(mask):
                     continue
                 new_filename = format_filename(
-                    filename, version_template, **template_kv
+                    filename, mask, version_template, **template_kv
                 )
                 if new_filename == filename:
                     continue
