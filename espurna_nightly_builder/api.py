@@ -1,3 +1,4 @@
+import io
 import json
 import logging
 import base64
@@ -119,10 +120,23 @@ class Repo(object):
             owner=self.owner, name=self.name
         )
 
-    def file(self, ref, filepath):
+    def compare(self, start, end, diff=True):
+        path = self._base("compare/{}...{}".format(start, end))
+
+        headers = {}
+        if diff:
+            headers["Accept"] = "application/vnd.github.VERSION.diff"
+
+        res = self.api.get(path, headers=headers)
+        return res.text
+
+    def contents(self, ref, filepath):
         path = self._base("contents/{}".format(filepath))
         res = self.api.get_json(path, params={"ref": ref})
-        return File(res)
+        return res
+
+    def file(self, ref, filepath):
+        return File(self.contents(ref, filepath))
 
     def update_file(self, branch, fileobj, message):
         path = self._base("contents/{}".format(fileobj.path))
@@ -235,6 +249,40 @@ class Repo(object):
 
     def latest_release(self):
         return self.releases(last=1)[0]
+
+
+class CommitRange(object):
+    def __init__(self, repo, start, end):
+        self._repo = repo
+        self._start = start
+        self._end = end
+
+    @property
+    def html_url(self):
+        url = "https://github.com/{owner}/{name}/compare/{start}...{end}".format(
+            owner=self._repo.owner,
+            name=self._repo.name,
+            start=self._start,
+            end=self._end,
+        )
+        return url
+
+    def dir_changed(self, directory):
+        def diff_files(line):
+            _, _, a, b = line.split(" ")
+
+            _, _, a = a.partition("/")
+            _, _, b = b.partition("/")
+
+            return a, b
+
+        text = self._repo.compare(self._start, self._end, diff=True)
+        stream = io.StringIO(text)
+
+        # diff --git a/path b/path
+        paths = [diff_files(line) for line in stream if line.startswith("diff")]
+
+        return any(a.startswith(directory) or b.startswith(directory) for a, b in paths)
 
 
 # latest release will likely have same commit on both master (release branch) and dev

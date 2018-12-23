@@ -64,6 +64,7 @@ def f_prepare(args):
         builder_repo,
         target_branch=args.target_branch,
         builder_branch=args.builder_branch,
+        source_directory=args.source_directory,
         commit_filename=args.commit_filename,
     )
 
@@ -140,6 +141,7 @@ def setup_argparse():
     cmd_setup_repo.set_defaults(func=f_setup_repo)
 
     cmd_prepare = subparser.add_parser("prepare", help=prepare.__doc__)
+    cmd_prepare.add_argument("--source-directory", default="code")
     cmd_prepare.add_argument("target_repo")
     cmd_prepare.add_argument("builder_repo", nargs="?", default=REPO)
     cmd_prepare.set_defaults(func=f_prepare)

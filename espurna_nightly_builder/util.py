@@ -22,13 +22,6 @@ def git_head(short=False, cwd=None):
     return run(cmd=cmd, cwd=cwd)
 
 
-def compare_url(repo, start, end):
-    url = "https://github.com/{owner}/{name}/compare/{start}...{end}".format(
-        owner=repo.owner, name=repo.name, start=start, end=end
-    )
-    return url
-
-
 def last_month_prefix():
     date = datetime.datetime.utcnow()
     delta = datetime.timedelta(1)
