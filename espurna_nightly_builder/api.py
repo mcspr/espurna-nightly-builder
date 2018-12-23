@@ -1,4 +1,5 @@
 import io
+import re
 import json
 import logging
 import base64
@@ -252,6 +253,17 @@ class Repo(object):
 
 
 class CommitRange(object):
+
+    RE_BINARY_FILES = re.compile(
+        r"^Binary files (?P<source_filename>[^\t\n]+) and (?P<target_filename>[^\t\n]+) differ"
+    )
+    RE_SOURCE_FILE = re.compile(
+        r"^--- (?P<filename>[^\t\n]+)(?:\t(?P<timestamp>[^\n]+))?"
+    )
+    RE_TARGET_FILE = re.compile(
+        r"^\+\+\+ (?P<filename>[^\t\n]+)(?:\t(?P<timestamp>[^\n]+))?"
+    )
+
     def __init__(self, repo, start, end):
         self._repo = repo
         self._start = start
@@ -267,22 +279,37 @@ class CommitRange(object):
         )
         return url
 
-    def dir_changed(self, directory):
-        def diff_files(line):
-            _, _, a, b = line.split(" ")
-
-            _, _, a = a.partition("/")
-            _, _, b = b.partition("/")
-
-            return a, b
-
+    def path_changed(self, path_match):
         text = self._repo.compare(self._start, self._end, diff=True)
         stream = io.StringIO(text)
 
-        # diff --git a/path b/path
-        paths = [diff_files(line) for line in stream if line.startswith("diff")]
+        def git_path(path):
+            if path.startswith("a/") or path.startswith("b/"):
+                return path[2:]
+            return path
 
-        return any(a.startswith(directory) or b.startswith(directory) for a, b in paths)
+        # adapted from unidiff (https://github.com/matiasb/python-unidiff) + binary files support
+        for line in stream:
+            src_file = self.RE_SOURCE_FILE.match(line)
+            if src_file:
+                path = git_path(src_file.group("filename"))
+                if path.startswith(path_match):
+                    return True
+
+            trg_file = self.RE_TARGET_FILE.match(line)
+            if trg_file:
+                path = git_path(trg_file.group("filename"))
+                if path.startswith(path_match):
+                    return True
+
+            bin_files = self.RE_BINARY_FILES.match(line)
+            if bin_files:
+                src = git_path(bin_files.group("source_filename"))
+                trg = git_path(bin_files.group("target_filename"))
+                if src.startswith(path_match) or trg.startswith(path_match):
+                    return True
+
+        return False
 
 
 # latest release will likely have same commit on both master (release branch) and dev

@@ -12,7 +12,7 @@ def prepare(
     builder_repo,
     target_branch="dev",
     builder_branch="nightly",
-    source_directory="code",
+    source_directory="code/",
     commit_filename="commit.txt",
 ):
     """Run in install phase.
@@ -39,7 +39,7 @@ def prepare(
         raise errors.Released
 
     commit_range = CommitRange(target_repo, old_sha, head_sha)
-    if not commit_range.dir_changed(source_directory):
+    if not commit_range.path_changed(source_directory):
         raise errors.NotChanged
 
     commit_file.content = head_sha
