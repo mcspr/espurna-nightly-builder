@@ -24,7 +24,7 @@ from espurna_nightly_builder.api import Repo, Api
 from espurna_nightly_builder.prepare import prepare
 from espurna_nightly_builder.mkenv import mkenv
 from espurna_nightly_builder.setup_repo import setup_repo
-from espurna_nightly_builder.rename_releases import rename_releases, VERSION_FMT
+from espurna_nightly_builder.rename_releases import rename_releases
 from espurna_nightly_builder.util import nightly_tag, last_month_prefix
 
 
@@ -44,6 +44,7 @@ def get_env_config():
 
 TOKEN, EVENT, REPO = get_env_config()
 API = Api(TOKEN)
+VERSION_FMT = "{orig_version}.nightly{tag}+git{sha:.8}"
 
 
 def f_prepare(args):

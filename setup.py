@@ -8,6 +8,7 @@ setup(name="espurna-nightly-builder",
           "requests"
       ],
       packages=["espurna_nightly_builder"],
+      test_suite="tests",
       entry_points={
           "console_scripts": [
               "espurna_nightly = espurna_nightly_builder.__main__:main"
