@@ -55,7 +55,7 @@ class Api(object):
 
     BASE_REST = "https://api.github.com/"
     BASE_GRAPHQL = "https://api.github.com/graphql"
-    USER_AGENT = "mcspr/espurna-travis-test/builder-v1.0"
+    USER_AGENT = "mcspr/espurna-nightly-builder/builder-v1.0"
 
     def __init__(self, token):
         self.token = token
