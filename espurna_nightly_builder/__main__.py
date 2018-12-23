@@ -3,12 +3,20 @@ import logging
 import os
 import sys
 
+
+from espurna_nightly_builder.errors import Error
+from espurna_nightly_builder.api import Repo, Api
+from espurna_nightly_builder.prepare import prepare
+from espurna_nightly_builder.mkenv import mkenv
+from espurna_nightly_builder.setup_repo import setup_repo
+from espurna_nightly_builder.rename_releases import rename_releases
+from espurna_nightly_builder.util import nightly_tag, last_month_prefix
+
+
 logging.basicConfig(
     level=logging.INFO, format="%(relativeCreated)6d %(levelname)-8s %(message)s"
 )
 log = logging.getLogger("main")
-
-from espurna_nightly_builder.errors import Error
 
 
 def exc_handler(exc_type, exc_value, exc_trace):
@@ -19,13 +27,6 @@ def exc_handler(exc_type, exc_value, exc_trace):
 
 
 sys.excepthook = exc_handler
-
-from espurna_nightly_builder.api import Repo, Api
-from espurna_nightly_builder.prepare import prepare
-from espurna_nightly_builder.mkenv import mkenv
-from espurna_nightly_builder.setup_repo import setup_repo
-from espurna_nightly_builder.rename_releases import rename_releases
-from espurna_nightly_builder.util import nightly_tag, last_month_prefix
 
 
 # TODO argparse?
