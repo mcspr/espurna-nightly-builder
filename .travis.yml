@@ -65,9 +65,11 @@ stages:
 
 script:
   - |
+    set -e
     pushd espurna/code
     TRAVIS_COMMIT=$NIGHTLY_COMMIT_SHA ./build.sh -p
     popd
+    set +e
 
 jobs:
   include:
