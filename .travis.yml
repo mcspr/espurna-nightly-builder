@@ -4,7 +4,6 @@ python:
 
 env:
   global:
-  - PLATFORMIO_LIBDEPS_DIR="${HOME}/pio-libdeps"
   - BUILDER_TOTAL_THREADS=4
 
 cache:
@@ -12,12 +11,12 @@ cache:
   - ${HOME}/.npm
   - ${HOME}/.cache/pip
   - ${HOME}/.platformio
-  - ${HOME}/pio-libdeps
 
 install:
   - env | grep TRAVIS
   - set -e
   - pip install -U platformio
+  - pio platform update -p
   - npm install -g npm@latest
   - |
     pip install .
