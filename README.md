@@ -1,6 +1,6 @@
 # ESPurna Nightly Builder
-[![latest release tag](https://img.shields.io/github/release/mcspr/espurna-nightly-builder/all.svg?label=Latest%20release)](https://github.com/mcspr/espurna-nightly-builder/releases)
-[travis-ci.org build logs](https://travis-ci.org/mcspr/espurna-nightly-builder/builds)
+[![latest release tag](https://img.shields.io/github/release/mcspr/espurna-nightly-builder/all.svg?label=Latest%20release)](https://github.com/mcspr/espurna-nightly-builder/releases)  
+[travis-ci.com build logs](https://travis-ci.com/mcspr/espurna-nightly-builder/builds)
 
 # Nightly build?
 
