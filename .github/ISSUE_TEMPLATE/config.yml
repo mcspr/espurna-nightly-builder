@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: ESPurna issue tracker
+    url: https://github.com/xoseperez/espurna/issues
+    about: Please report any issues with the specific firmware version here.
+  - name: Gitter channel
+    url: https://gitter.im/tinkerman-cat/espurna
+    about: Please ask and answer questions here.
