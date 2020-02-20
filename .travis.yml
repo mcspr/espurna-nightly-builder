@@ -15,7 +15,9 @@ cache:
 install:
   - env | grep TRAVIS
   - set -e
-  - pip install -U platformio
+  - |
+    pip install -U platformio
+    pio upgrade --dev
   - pio platform update -p
   - npm install -g npm@latest
   - |
