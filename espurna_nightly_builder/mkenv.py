@@ -9,17 +9,23 @@ def mkenv(
 ):
     """Preserve github's release unique id."""
 
-    url = target_repo.clone_url
+    target_url = target_repo.clone_url
 
     release = builder_repo.latest_release()
-    number = release["number"]
 
     commit_file = builder_repo.file(builder_branch, commit_filename)
-    sha = commit_file.content
+    target_sha = commit_file.content
 
-    log.info("release for %s - {number:%d sha:%s}", url, number, sha)
+    log.info(
+        "release for %s - {number:%d builder_sha:%s target_sha:%s}",
+        target_url,
+        release["number"],
+        release["sha"],
+        target_sha,
+    )
 
     with open("environment", "w") as f:
-        f.write("export NIGHTLY_TARGET_REPO_URL={}\n".format(url))
-        f.write("export NIGHTLY_RELEASE_NUMBER={}\n".format(number))
-        f.write("export NIGHTLY_COMMIT_SHA={}\n".format(sha))
+        f.write("export NIGHTLY_TARGET_REPO_URL={}\n".format(target_url))
+        f.write("export NIGHTLY_TARGET_COMMIT_SHA={}\n".format(target_sha))
+        f.write("export NIGHTLY_BUILDER_RELEASE_NUMBER={}\n".format(release["number"]))
+        f.write("export NIGHTLY_BUILDER_COMMIT_SHA={}\n".format(release["sha"]))

@@ -34,7 +34,7 @@ install:
     git init espurna
     pushd espurna
     git remote add origin ${NIGHTLY_TARGET_REPO_URL}
-    git fetch --depth=1 origin ${NIGHTLY_COMMIT_SHA}
+    git fetch --depth=1 origin ${NIGHTLY_TARGET_COMMIT_SHA}
     git checkout FETCH_HEAD
     popd
   - |
@@ -44,7 +44,7 @@ install:
   - set +e
 
 before_deploy:
-    - espurna_nightly rename_releases --sha ${NIGHTLY_COMMIT_SHA} espurna/firmware
+    - espurna_nightly rename_releases --sha ${NIGHTLY_TARGET_COMMIT_SHA} espurna/firmware
 
 deploy:
   provider: releases
@@ -53,7 +53,8 @@ deploy:
   file: espurna/firmware/**/*
   overwrite: true
   skip_cleanup: true
-  release_number: ${NIGHTLY_RELEASE_NUMBER}
+  target_commitish: ${NIGHTLY_BUILDER_COMMIT_SHA}
+  release_number: ${NIGHTLY_BUILDER_RELEASE_NUMBER}
   on:
     branch: builder
     repo: mcspr/espurna-nightly-builder
@@ -68,7 +69,7 @@ script:
   - |
     set -e
     pushd espurna/code
-    TRAVIS_COMMIT=$NIGHTLY_COMMIT_SHA ./build.sh -p
+    TRAVIS_COMMIT=$NIGHTLY_TARGET_COMMIT_SHA ./build.sh -p
     popd
     set +e
 
