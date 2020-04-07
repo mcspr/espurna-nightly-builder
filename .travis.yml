@@ -69,7 +69,7 @@ script:
   - |
     set -e
     pushd espurna/code
-    TRAVIS_COMMIT=$NIGHTLY_TARGET_COMMIT_SHA ./build.sh -p
+    TRAVIS_COMMIT=$NIGHTLY_TARGET_COMMIT_SHA ./build.sh -r
     popd
     set +e
 
