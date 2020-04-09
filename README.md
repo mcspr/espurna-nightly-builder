@@ -4,7 +4,7 @@
 
 # Nightly build?
 
-This repo is used to build binary release of [ESPurna](https://github.com/xoseperez/espurna), every night at **04:10 UTC**  
+This repo is used to build binary release of [ESPurna](https://github.com/xoseperez/espurna).  
 Unlike official releases, binaries are created from latest commit to the [`dev`](https://github.com/xoseperez/espurna/tree/dev) branch.
 
 # Technical info
@@ -25,6 +25,11 @@ Finally, SHA value of the latest 'dev' branch commit is added to the 'nightly' b
 ## Release
 
 This stage runs the same build.sh script that is used to build official releases. Only difference is — after it is done, files are renamed to include current date (tag of the release) and git SHA hash value ('commit.txt' contents from the previous stage).
+
+## Known issues
+
+* Travis Cron will use `builder` branch to attach status of the build, since there is no release commit yet on the `nightly` branch.
+* **SOLVED** Travis dpl tool will change release commit from the one on the `nightly` branch to the current one of the `builder`. This happens accidentally, because dpl sends commit sha as part of the release step. By changing `target_commitish: ${NIGHTLY_BUILDER_COMMIT_SHA}` parameter of the `deploy:` section we force it to use newly created commit.
 
 # GitLab
 
