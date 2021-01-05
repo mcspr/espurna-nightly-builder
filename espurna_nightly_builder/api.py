@@ -188,10 +188,10 @@ class Repo(object):
         )
         return res
 
-    def commit_status(self, sha):
-        path = self._base("commits/{}/status".format(sha))
+    def commit_check_runs(self, sha):
+        path = self._base("commits/{}/check-runs".format(sha))
         res = self.api.get_json(path)
-        return (res["state"], res["statuses"])
+        return (res["total_count"], res["check_runs"])
 
     def branch_head(self, branch):
         path = self._base("branches/{}".format(branch))

@@ -3,6 +3,7 @@ class Error(Exception):
 
 
 TargetReleased = Error("Skipping commit released at the target repo")
+NoChecks = Error("Skipping commit without any check runs")
 Unbuildable = Error("Skipping not buildable commit")
 NoContent = Error("commit file has no content?")
 Released = Error("Skipping already released nightly")

@@ -18,15 +18,19 @@ def prepare(
     """Run in install phase.
     Do series of checks to verify that target_branch HEAD commit is eligable for building.
     Commit HEAD sha value to the builder_branch and prepare release pointing to it."""
+
     head_sha = target_repo.branch_head(target_branch)
     log.info("head commit: {}".format(head_sha))
     if release_is_head(target_repo, head_sha):
         raise errors.TargetReleased
 
-    state, _ = target_repo.commit_status(head_sha)
-    log.info("commit state: {}".format(state))
-    if state != "success":
-        raise errors.Unbuildable
+    count, check_runs = target_repo.commit_check_runs(head_sha)
+    if not count:
+        raise errors.NoChecks
+
+    for run in check_runs:
+        if (run["status"] != "completed") or (run["conclusion"] != "success"):
+            raise errors.Unbuildable
 
     commit_file = builder_repo.file(builder_branch, commit_filename)
     if not commit_file.content:
