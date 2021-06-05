@@ -7,7 +7,6 @@ import sys
 from . import errors
 from .api import Repo, Api, CommitRange
 from .prepare import prepare
-from .mkenv import mkenv
 from .setup_repo import setup_repo
 from .util import nightly_tag, last_month_prefix
 
@@ -44,17 +43,6 @@ def f_prepare(args):
         target_branch=args.target_branch,
         builder_branch=args.builder_branch,
         source_directory=args.source_directory,
-        commit_filename=args.commit_filename,
-    )
-
-
-def f_mkenv(args):
-    target_repo = Repo(args.target_repo, api=api_client(args))
-    builder_repo = Repo(args.builder_repo, api=api_client(args))
-    mkenv(
-        target_repo,
-        builder_repo,
-        builder_branch=args.builder_branch,
         commit_filename=args.commit_filename,
     )
 
@@ -138,11 +126,6 @@ def setup_argparse():
     cmd_prepare.add_argument("target_repo")
     cmd_prepare.add_argument("builder_repo")
     cmd_prepare.set_defaults(func=f_prepare)
-
-    cmd_mkenv = subparser.add_parser("mkenv", help=mkenv.__doc__)
-    cmd_mkenv.add_argument("target_repo")
-    cmd_mkenv.add_argument("builder_repo")
-    cmd_mkenv.set_defaults(func=f_mkenv)
 
     cmd_list_tags = subparser.add_parser("list-tags")
     cmd_list_tags.add_argument("builder_repo")
