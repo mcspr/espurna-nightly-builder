@@ -150,7 +150,31 @@ class Repo(object):
                 "sha": fileobj.sha,
             },
         )
-        return (res["content"], res["commit"])
+        return res
+
+    def add_tag(self, name, message, sha):
+        path = self._base("git/tags")
+        res = self.api.post_json(
+            path,
+            data={
+                "tag": name,
+                "message": message,
+                "object": sha,
+                "type": "commit"
+            },
+        )
+        return res
+
+    def add_ref(self, ref, sha):
+        path = self._base("git/refs")
+        res = self.api.post_json(
+            path,
+            data={
+                "ref": ref,
+                "sha": sha
+            },
+        )
+        return res
 
     def delete_tag(self, tagName):
         path = self._base("git/refs/tags/{}".format(tagName))
@@ -193,10 +217,10 @@ class Repo(object):
         res = self.api.get_json(path)
         return (res["total_count"], res["check_runs"])
 
-    def branch_head(self, branch):
-        path = self._base("branches/{}".format(branch))
+    def branches(self, name):
+        path = self._base("branches/{}".format(name))
         res = self.api.get_json(path)
-        return res["commit"]["sha"]
+        return res
 
     def releases(self, last=1):
         query = """

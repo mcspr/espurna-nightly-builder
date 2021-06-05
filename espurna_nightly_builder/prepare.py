@@ -15,11 +15,13 @@ def prepare(
     source_directory="code/",
     commit_filename="commit.txt",
 ):
-    """Run in install phase.
+    """Expected to be called periodically.
     Do series of checks to verify that target_branch HEAD commit is eligable for building.
-    Commit HEAD sha value to the builder_branch and prepare release pointing to it."""
+    Commit HEAD sha value to the builder_branch and create a lightweight tag pointing to it."""
 
-    head_sha = target_repo.branch_head(target_branch)
+    head = target_repo.branches(target_branch)
+    head_sha = head["commit"]["sha"]
+
     log.info("head commit: {}".format(head_sha))
     if release_is_head(target_repo, head_sha):
         raise errors.TargetReleased
@@ -49,12 +51,6 @@ def prepare(
     commit_file.content = head_sha
     tag = nightly_tag()
     msg = "Nightly build ({})".format(tag)
-    _, builder_commit = builder_repo.update_file(builder_branch, commit_file, msg)
 
-    builder_repo.create_release(
-        tag=tag,
-        name=msg,
-        sha=builder_commit["sha"],
-        body=commit_range.html_url,
-        prerelease=True,
-    )
+    updated_file = builder_repo.update_file(builder_branch, commit_file, msg)
+    builder_repo.add_ref("refs/tags/{}".format(tag), updated_file["commit"]["sha"])
