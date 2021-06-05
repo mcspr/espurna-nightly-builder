@@ -21,10 +21,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: builder
-          path: builder
 
       - run: |
-        cd builder
-        python -mespurna_nightly_builder prepare {{ github.event.inputs.target_repo }} {{ github.repository }}
-
+        python -mespurna_nightly_builder prepare ${{ github.event.inputs.target_repo }} ${{ github.repository }}
 
