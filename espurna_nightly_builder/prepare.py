@@ -1,8 +1,8 @@
 import logging
 
-from espurna_nightly_builder import errors
-from espurna_nightly_builder.api import release_is_head, CommitRange
-from espurna_nightly_builder.util import nightly_tag
+from . import errors
+from .api import release_is_head, CommitRange
+from .util import nightly_tag
 
 log = logging.getLogger(__name__)
 

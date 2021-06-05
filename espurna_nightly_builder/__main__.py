@@ -4,13 +4,13 @@ import os
 import sys
 
 
-from espurna_nightly_builder.errors import Error
-from espurna_nightly_builder.api import Repo, Api
-from espurna_nightly_builder.prepare import prepare
-from espurna_nightly_builder.mkenv import mkenv
-from espurna_nightly_builder.setup_repo import setup_repo
-from espurna_nightly_builder.rename_releases import rename_releases
-from espurna_nightly_builder.util import nightly_tag, last_month_prefix
+from .errors import Error
+from .api import Repo, Api
+from .prepare import prepare
+from .mkenv import mkenv
+from .setup_repo import setup_repo
+from .rename_releases import rename_releases
+from .util import nightly_tag, last_month_prefix
 
 
 logging.basicConfig(
@@ -20,7 +20,7 @@ log = logging.getLogger("main")
 
 
 def exc_handler(exc_type, exc_value, exc_trace):
-    if issubclass(exc_type, Error):
+    if issubclass(exc_type, errors.Error):
         log.error('Exiting: "{}"'.format(exc_value))
     else:
         log.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_trace))
