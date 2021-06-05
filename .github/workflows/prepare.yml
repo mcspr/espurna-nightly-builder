@@ -1,0 +1,30 @@
+#on:
+#  schedule:
+#    cron: '0 7 * * *'
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_repo:
+        description: 'Repo to compare with'
+        required: true
+        default: xoseperez/espurna
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - uses: actions/checkout@v2
+        with:
+          ref: builder
+          path: builder
+
+      - run: |
+        cd builder
+        python -mespurna_nightly_builder prepare {{ github.event.inputs.target_repo }} {{ github.repository }}
+
+
