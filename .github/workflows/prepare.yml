@@ -22,6 +22,8 @@ jobs:
         with:
           ref: builder
 
-      - run: |
+      - env:
+          GITHUB_TOKEN: ${{ secrets.BUILDER_TOKEN }}
+        run: |
           pip install .
           espurna_nightly prepare ${{ github.event.inputs.target_repo }} ${{ github.repository }}
