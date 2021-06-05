@@ -24,7 +24,7 @@ install:
   - |
     pip install .
     if [ ${TRAVIS_BUILD_STAGE_NAME} = "Test" ]; then
-        espurna_nightly prepare xoseperez/espurna
+        espurna_nightly prepare xoseperez/espurna mcspr/espurna-nightly-builder
         exit $?
     fi
     if [ ${TRAVIS_BUILD_STAGE_NAME} = "Release" ]; then

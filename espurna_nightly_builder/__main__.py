@@ -36,15 +36,6 @@ def api_client(args):
 
 
 def f_prepare(args):
-    if EVENT == "cron":
-        log.info("Starting nightly builder checks")
-    elif EVENT == "api":
-        log.info("Continuing to the next stage")
-        sys.exit(0)
-    else:
-        log.error("Unknown travis event type")
-        sys.exit(1)
-
     target_repo = Repo(args.target_repo, api=api_client(args))
     builder_repo = Repo(args.builder_repo, api=api_client(args))
     prepare(
@@ -131,7 +122,7 @@ def f_compare_latest(args):
 def setup_argparse():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--token", required=True)
+    parser.add_argument("--token", default=os.environ.get("GITHUB_TOKEN"))
     parser.add_argument("--commit-filename", default="commit.txt")
     parser.add_argument("--target-branch", default="dev")
     parser.add_argument("--builder-branch", default="nightly")
