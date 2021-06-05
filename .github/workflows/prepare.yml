@@ -25,5 +25,10 @@ jobs:
       - env:
           GITHUB_TOKEN: ${{ secrets.BUILDER_TOKEN }}
         run: |
+          # ref. pypa/pip#8180
+          # default ubuntu install does not include wheel, thus... install it right here
+          python -mpip install -U pip wheel
           pip install .
+          # personalized token is required, since we trigger a commit on success
+          # and gh actions won't trigger another event when it is the default one
           espurna_nightly prepare ${{ github.event.inputs.target_repo }} ${{ github.repository }}
