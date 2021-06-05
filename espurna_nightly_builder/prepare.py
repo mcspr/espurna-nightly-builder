@@ -52,5 +52,6 @@ def prepare(
     tag = nightly_tag()
     msg = "Nightly build ({})".format(tag)
 
+    raise errors.Error("Dont want this {}".format(msg))
     updated_file = builder_repo.update_file(builder_branch, commit_file, msg)
     builder_repo.add_ref("refs/tags/{}".format(tag), updated_file["commit"]["sha"])
