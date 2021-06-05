@@ -23,4 +23,5 @@ jobs:
           ref: builder
 
       - run: |
-          python -mespurna_nightly_builder prepare ${{ github.event.inputs.target_repo }} ${{ github.repository }}
+          pip install .
+          espurna_nightly prepare ${{ github.event.inputs.target_repo }} ${{ github.repository }}
