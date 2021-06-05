@@ -106,6 +106,28 @@ def f_delete_releases(args):
             log.error("could not delete the tag")
 
 
+def f_compare_latest(args):
+    target_repo = Repo(args.target_repo, api=api_client(args))
+    builder_repo = Repo(args.builder_repo, api=api_client(args))
+    head = builder_repo.branches(args.builder_branch)
+
+    parents = head["commit"]["parents"]
+    if len(parents) > 1:
+        raise errors.MultipleParents
+    elif not len(parents):
+        raise errors.NoParents
+
+    head_sha = head["commit"]["sha"]
+    parent_sha = parents[0]["sha"]
+
+
+    head_commit = builder_repo.file(head_sha, args.commit_filename)
+    parent_commit = builder_repo.file(parent_sha, args.commit_filename)
+
+    compare = CommitRange(target_repo, parent_commit.content, head_commit.content)
+    print(compare.html_url)
+
+
 def setup_argparse():
     parser = argparse.ArgumentParser()
 
@@ -139,6 +161,11 @@ def setup_argparse():
     cmd_delete.add_argument("--prefix", default=last_month_prefix())
     cmd_delete.add_argument("builder_repo")
     cmd_delete.set_defaults(func=f_delete_releases)
+
+    cmd_compare_latest = subparser.add_parser("compare-latest")
+    cmd_compare_latest.add_argument("target_repo")
+    cmd_compare_latest.add_argument("builder_repo")
+    cmd_compare_latest.set_defaults(func=f_compare_latest)
 
     return parser
 
