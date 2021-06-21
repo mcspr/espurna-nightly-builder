@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          depth: 2
+          fetch-depth: 2
           ref: nightly
           path: nightly
 
@@ -18,8 +18,8 @@ jobs:
         id: get-commit-hash
         run: |
           pushd nightly
-          echo "::set-output name=nightly-commit::"$(git show HEAD:commit.txt)
           echo "::set-output name=previous-commit::"$(git show HEAD~1:commit.txt)
+          echo "::set-output name=nightly-commit::"$(git show HEAD:commit.txt)
           popd
 
   actual-work:
