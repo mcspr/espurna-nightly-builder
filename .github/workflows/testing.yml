@@ -5,35 +5,26 @@ jobs:
   test:
     runs-on: ubuntu-20.04
     outputs:
-      previous-commit: ${{ steps.previous.commit }}
-      current-commit: ${{ steps.current.commit }}
-      test: ${{ steps.test.test }}
+      previous-commit: ${{ steps.commit.outputs.previous }}
+      current-commit: ${{ steps.commit.outputs.current }}
+      tag: ${{ steps.commit.outputs.tag }}
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 2
           ref: nightly
 
-      - run: |
-          git --no-pager log --format=oneline
-          printf 'previous:%s current:%s\n' \
-            $(git show HEAD~1:commit.txt) \
-            $(git show HEAD:commit.txt)
-
-      - id: test
-        run: echo "::set-output name=test::testtesttest"
-
-      - id: previous
-        run: echo "::set-output name=commit::"$(git show HEAD~1:commit.txt)
-
-      - id: current
-        run: echo "::set-output name=commit::"$(git show HEAD:commit.txt)
+      - id: commit
+        run: echo "::set-output name=tag::"$(git log --date="format:%Y%m%d" --format="%ad" -n 1)
+        run: echo "::set-output name=previous::"$(git show HEAD~1:commit.txt)
+        run: echo "::set-output name=current::"$(git show HEAD:commit.txt)
 
   actual-work:
     needs: [test]
     runs-on: ubuntu-20.04
     steps:
       - run: |
-          echo "Some test data is "${{ needs.test.outputs.test }}
-          echo "Previous commit is "${{ needs.test.outputs.previous-commit }}
-          echo "Nightly commit is "${{ needs.test.outputs.current-commit }}
+          printf 'Compare url is: https://github.com/xoseperez/espurna/compare/%s...%s\n' \
+             ${{ needs.test.outputs.previous-commit }} \
+             ${{ needs.test.outputs.current-commit }}
+          printf 'Builder tag would be %s\n' ${{ needs.test.outputs.tag }}
