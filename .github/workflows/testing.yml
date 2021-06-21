@@ -5,8 +5,9 @@ jobs:
   test:
     runs-on: ubuntu-20.04
     outputs:
-      current-commit: ${{ steps.commit.current }}
-      previous-commit: ${{ steps.commit.previous }}
+      previous-commit: ${{ steps.previous.commit }}
+      current-commit: ${{ steps.current.commit }}
+      test: ${{ steps.test.test }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -15,18 +16,24 @@ jobs:
 
       - run: |
           git --no-pager log --format=oneline
-          git show HEAD~1:commit.txt
-          git show HEAD:commit.txt
+          printf 'previous:%s current:%s\n' \
+            $(git show HEAD~1:commit.txt) \
+            $(git show HEAD:commit.txt)
 
-      - id: commit
-        run: |
-          echo "::set-output name=previous::"$(git show HEAD~1:commit.txt)
-          echo "::set-output name=current::"$(git show HEAD:commit.txt)
+      - id: test
+        run: echo "::set-output name=test::testtesttest"
+
+      - id: previous
+        run: echo "::set-output name=commit::"$(git show HEAD~1:commit.txt)
+
+      - id: current
+        run: echo "::set-output name=commit::"$(git show HEAD:commit.txt)
 
   actual-work:
     needs: [test]
     runs-on: ubuntu-20.04
     steps:
       - run: |
-          echo "Nightly commit is "${{ needs.test.outputs.current-commit }}
+          echo "Some test data is "${{ needs.test.outputs.test }}
           echo "Previous commit is "${{ needs.test.outputs.previous-commit }}
+          echo "Nightly commit is "${{ needs.test.outputs.current-commit }}
