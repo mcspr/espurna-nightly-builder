@@ -12,7 +12,6 @@ jobs:
         with:
           fetch-depth: 2
           ref: nightly
-          path: nightly
 
       - run: |
           git --no-pager log --format=oneline
