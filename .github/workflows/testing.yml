@@ -1,0 +1,31 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+    outputs:
+      nightly-commit: ${{ steps.get-commit-hash.nightly-commit }}
+      previous-commit: ${{ steps.get-commit-hash.previous-commit }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          depth: 2
+          ref: nightly
+          path: nightly
+
+      - name: Get nightly commit hash
+        id: get-commit-hash
+        run: |
+          pushd nightly
+          echo "::set-output name=nightly-commit::"$(git show HEAD:commit.txt)
+          echo "::set-output name=previous-commit::"$(git show HEAD~1:commit.txt)
+          popd
+
+  actual-work:
+    needs: [test]
+    runs-on: ubuntu-20.04
+    steps:
+      - run: |
+          echo "Nightly commit is "${{ needs.test.nightly-commit }}
+          echo "Previous commit is "${{ needs.test.previous-commit }}
