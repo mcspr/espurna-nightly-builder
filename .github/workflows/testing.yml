@@ -5,8 +5,8 @@ jobs:
   test:
     runs-on: ubuntu-20.04
     outputs:
-      nightly-commit: ${{ steps.get-commit-hash.nightly-commit }}
-      previous-commit: ${{ steps.get-commit-hash.previous-commit }}
+      current-commit: ${{ steps.commit.current }}
+      previous-commit: ${{ steps.commit.previous }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -14,18 +14,20 @@ jobs:
           ref: nightly
           path: nightly
 
-      - name: Get nightly commit hash
-        id: get-commit-hash
+      - run: |
+          git --no-pager log --format=oneline
+          git show HEAD~1:commit.txt
+          git show HEAD:commit.txt
+
+      - id: commit
         run: |
-          pushd nightly
-          echo "::set-output name=previous-commit::"$(git show HEAD~1:commit.txt)
-          echo "::set-output name=nightly-commit::"$(git show HEAD:commit.txt)
-          popd
+          echo "::set-output name=previous::"$(git show HEAD~1:commit.txt)
+          echo "::set-output name=current::"$(git show HEAD:commit.txt)
 
   actual-work:
     needs: [test]
     runs-on: ubuntu-20.04
     steps:
       - run: |
-          echo "Nightly commit is "${{ needs.test.nightly-commit }}
-          echo "Previous commit is "${{ needs.test.previous-commit }}
+          echo "Nightly commit is "${{ needs.test.outputs.current-commit }}
+          echo "Previous commit is "${{ needs.test.outputs.previous-commit }}
