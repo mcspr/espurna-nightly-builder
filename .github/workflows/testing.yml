@@ -15,9 +15,10 @@ jobs:
           ref: nightly
 
       - id: commit
-        run: echo "::set-output name=tag::"$(git log --date="format:%Y%m%d" --format="%ad" -n 1)
-        run: echo "::set-output name=previous::"$(git show HEAD~1:commit.txt)
-        run: echo "::set-output name=current::"$(git show HEAD:commit.txt)
+        run: |
+          echo "::set-output name=tag::"$(git log --date="format:%Y%m%d" --format="%ad" -n 1)
+          echo "::set-output name=previous::"$(git show HEAD~1:commit.txt)
+          echo "::set-output name=current::"$(git show HEAD:commit.txt)
 
   actual-work:
     needs: [test]
