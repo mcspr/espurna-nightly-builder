@@ -120,4 +120,5 @@ jobs:
           tag: ${{ steps.nightly.outputs.tag }}
           commit: ${{ github.sha }}
           body: https://github.com/xoseperez/espurna/compare/${{ needs.nightly.outputs.previous }}...${{ steps.nightly.outputs.head }}
+          prerelease: true
           artifacts: "binaries/*.bin"
