@@ -20,13 +20,21 @@ jobs:
 
       - id: commit
         run: |
-          echo "::set-output name=tag::"$(git log --date="format:%Y%m%d" --format="%ad" -n 1)
-          echo "::set-output name=head::"$(git show HEAD:commit.txt)
-          echo "::set-output name=previous::"$(git show HEAD~1:commit.txt)
+          # TODO: echo "SOMETHING=$(exit 1)" does not trigger an error based on the exit code
+          tag=$(git log --date="format:%Y%m%d" --format"%ad" -n 1)
+          echo "::set-output name=tag::"$tag
+
+          head=$(git show HEAD:commit.txt)
+          echo "::set-output name=head::"$head
+
+          previous=$(git show HEAD~1:commit.txt)
+          echo "::set-output name=previous::"$previous
 
   build:
     needs: nightly
     runs-on: ubuntu-20.04
+    env:
+      ESPURNA_PIO_SHARED_LIBRARIES: "1"
     strategy:
       matrix:
         thread: [0, 1, 2, 3]
@@ -55,7 +63,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.platformio
-          key: ${{ runner.os }}-platoformio-${{ hashFiles('espurna/code/platformio.ini') }}
+          key: ${{ runner.os }}-platformio-${{ hashFiles('espurna/code/platformio.ini') }}
 
       - name: Install PlatformIO
         run: |
