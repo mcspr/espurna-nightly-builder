@@ -110,6 +110,7 @@ jobs:
   upload:
     needs: [nightly, build]
     runs-on: ubuntu-20.04
+    steps:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
