@@ -1,14 +1,18 @@
 name: Nightly
 
+#on:
+#  push:
+#    branches: [nightly]
+#    paths: commit.txt
+
 on:
-  push:
-    branches: [nightly]
-    paths: commit.txt
+  workflow_dispatch:
 
 jobs:
   nightly:
     runs-on: ubuntu-20.04
     outputs:
+      commit: ${{ steps.commit.outputs.commit }}
       tag: ${{ steps.commit.outputs.tag }}
       head: ${{ steps.commit.outputs.head }}
       previous: ${{ steps.commit.outputs.previous }}
@@ -29,6 +33,9 @@ jobs:
 
           previous=$(git show HEAD~1:commit.txt)
           echo "::set-output name=previous::"$previous
+
+          commit=$(git rev-parse HEAD)
+          echo "::set-output name=commit::"$commit
 
   build:
     needs: nightly
@@ -118,7 +125,7 @@ jobs:
         with:
           token: ${{ secrets.BUILDER_TOKEN }}
           tag: ${{ needs.nightly.outputs.tag }}
-          commit: ${{ github.sha }}
+          commit: ${{ needs.nightly.outputs.commit }}
           name: Nightly build (${{ needs.nightly.outputs.tag }})
           body: https://github.com/xoseperez/espurna/compare/${{ needs.nightly.outputs.previous }}...${{ needs.nightly.outputs.head }}
           prerelease: true
