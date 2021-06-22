@@ -1,0 +1,115 @@
+name: Nightly
+
+on:
+  push:
+    branches: [nightly]
+    paths: commit.txt
+
+jobs:
+  nightly:
+    runs-on: ubuntu-20.04
+    outputs:
+      tag: ${{ steps.commit.outputs.tag }}
+      head: ${{ steps.commit.outputs.head }}
+      previous: ${{ steps.commit.outputs.previous }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+          ref: nightly
+
+      - id: commit
+        run: |
+          echo "::set-output name=tag::"$(git log --date="format:%Y%m%d" --format="%ad" -n 1)
+          echo "::set-output name=head::"$(git show HEAD:commit.txt)
+          echo "::set-output name=previous::"$(git show HEAD~1:commit.txt)
+
+  build:
+    needs: nightly
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        thread: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: xoseperez/espurna
+          path: espurna
+          ref: ${{ needs.nightly.outputs.head }}
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Cache Node
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('espurna/code/package-lock.json', 'espurna/code/package.json') }}
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v2
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-platoformio-${{ hashFiles('espurna/code/platformio.ini') }}
+
+      - name: Install PlatformIO
+        run: |
+          pip install -U platformio
+          pio upgrade --dev
+
+      - name: Build
+        run: |
+          git config --global advice.detachedHead false
+          pushd espurna/code
+          npm ci
+          node node_modules/gulp/bin/gulp.js
+          # each "thread" only builds every Nth environment
+          # numbers are hard-coded above (...until there's a better idea for doing this)
+          ./scripts/generate_release_sh.py \
+              --ignore secure-client \
+              --destination ${GITHUB_WORKSPACE}/binaries \
+              --builder-thread ${{ matrix.thread }} \
+              --builder-total-threads 4 \
+              --suffix nightly${{ needs.nightly.outputs.tag }} \
+              --revision $(echo ${{ needs.nightly.outputs.head }} | cut -c-8) \
+              >> release.sh
+          bash release.sh
+          popd
+
+      - name: Archive
+        run: |
+          pushd binaries
+          zip -j -q -r ../Binaries_${{ matrix.thread }}.zip ./
+          popd
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Binaries
+          path: Binaries_${{ matrix.thread }}.zip
+
+  upload:
+    needs: [nightly, build]
+    runs-on: ubuntu-20.04
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - uses: actions/download-artifact@v2
+        with:
+          path: artifacts/
+
+      - name: Unpack
+        run: unzip -d binaries "artifacts/Binaries/*.zip"
+
+      - uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.BUILDER_TOKEN }}
+          tag: ${{ steps.nightly.outputs.tag }}
+          commit: ${{ github.sha }}
+          body: https://github.com/xoseperez/espurna/compare/${{ needs.nightly.outputs.previous }}...${{ steps.nightly.outputs.head }}
+          artifacts: "binaries/*.bin"
