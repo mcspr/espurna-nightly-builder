@@ -48,10 +48,8 @@ def prepare(
     if not commit_range.path_changed(source_directory):
         raise errors.NotChanged
 
-    commit_file.content = head_sha
-    tag = nightly_tag()
-    msg = "Nightly build ({})".format(tag)
+    raise errors.Error("Would've commited old:{} new:{} url:{}".format(
+        old_sha, head_sha, commit_range.compare_url))
 
-    raise errors.Error("Dont want this {}".format(msg))
-    updated_file = builder_repo.update_file(builder_branch, commit_file, msg)
-    builder_repo.add_ref("refs/tags/{}".format(tag), updated_file["commit"]["sha"])
+    commit_file.content = head_sha
+    response = builder_repo.update_file(builder_branch, commit_file, commit_range.compare_url)

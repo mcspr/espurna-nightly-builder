@@ -85,26 +85,61 @@ def f_delete_releases(args):
             log.error("could not delete the tag")
 
 
-def f_compare_latest(args):
-    target_repo = Repo(args.target_repo, api=api_client(args))
+def f_show_latest(args):
     builder_repo = Repo(args.builder_repo, api=api_client(args))
+
     head = builder_repo.branches(args.builder_branch)
+    sha = head["commit"]["sha"]
+    message = head["commit"]["commit"]["message"]
+    log.info("builder head:%s message:%s", sha, message)
 
-    parents = head["commit"]["parents"]
-    if len(parents) > 1:
-        raise errors.MultipleParents
-    elif not len(parents):
-        raise errors.NoParents
-
-    head_sha = head["commit"]["sha"]
-    parent_sha = parents[0]["sha"]
+    target_commit = builder_repo.file(sha, args.commit_filename).content
+    log.info("head target:%s", target_commit)
 
 
-    head_commit = builder_repo.file(head_sha, args.commit_filename)
-    parent_commit = builder_repo.file(parent_sha, args.commit_filename)
+def f_testtagging(args):
+    builder_repo = Repo(args.builder_repo, api=api_client(args))
 
-    compare = CommitRange(target_repo, parent_commit.content, head_commit.content)
-    print(compare.html_url)
+    ref_string = "tags/{}".format(args.tag)
+
+    print('creating tag', args.tag)
+    print('for sha', args.sha)
+
+    tag = builder_repo.add_tag(args.tag, "some tag message", args.sha)
+
+    print('creating ref', ref_string)
+    builder_repo.add_ref("refs/{}".format(ref_string), tag["sha"])
+
+    print('tag sha is', tag["sha"])
+    print('created tag for', tag["object"]["sha"])
+
+    print("waiting...")
+    input()
+
+    print("deleting ref")
+    builder_repo.delete_ref("refs/{}".format(ref_string))
+    input()
+
+    print("deleting tag")
+    builder_repo.delete_tag(tag["sha"])
+    input()
+
+
+def f_mkoutputs(args):
+    builder_repo = Repo(args.builder_repo, api=api_client(args))
+
+    ref = builder_repo.ref_object("tags/{}".format(args.tag))
+    tag = builder_repo.tag_object(ref["object"]["sha"])
+    commit = builder_repo.commit_object(tag["object"]["sha"])
+
+    print('tag is', args.tag)
+    print('tag sha', tag["sha"])
+    print('points to commit', commit["sha"])
+    print('tag message is', tag["message"])
+    print('commit message is', commit["message"])
+
+    nightly_commit = builder_repo.file(commit["sha"], args.commit_filename)
+    print('target commit is', nightly_commit.content)
 
 
 def setup_argparse():
@@ -136,10 +171,20 @@ def setup_argparse():
     cmd_delete.add_argument("builder_repo")
     cmd_delete.set_defaults(func=f_delete_releases)
 
-    cmd_compare_latest = subparser.add_parser("compare-latest")
-    cmd_compare_latest.add_argument("target_repo")
-    cmd_compare_latest.add_argument("builder_repo")
-    cmd_compare_latest.set_defaults(func=f_compare_latest)
+    cmd_mkoutputs = subparser.add_parser("mkoutputs")
+    cmd_mkoutputs.add_argument("--tag", required=True)
+    cmd_mkoutputs.add_argument("builder_repo")
+    cmd_mkoutputs.set_defaults(func=f_mkoutputs)
+
+    cmd_show_latest = subparser.add_parser("show-latest")
+    cmd_show_latest.add_argument("builder_repo")
+    cmd_show_latest.set_defaults(func=f_show_latest)
+
+    cmd_test = subparser.add_parser("test-tagging")
+    cmd_test.add_argument("--tag")
+    cmd_test.add_argument("--sha")
+    cmd_test.add_argument("builder_repo")
+    cmd_test.set_defaults(func=f_testtagging)
 
     return parser
 

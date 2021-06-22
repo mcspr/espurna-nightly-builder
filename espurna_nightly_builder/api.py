@@ -9,6 +9,7 @@ try:
 except ImportError:
     from urlparse import urljoin
 
+from . import errors
 import requests
 
 
@@ -47,7 +48,7 @@ class File(object):
         return data
 
     def __repr__(self):
-        return '<File(path="{}",sha="{}">'.format(self.path, self.sha)
+        return '<File path="{}" sha={}>'.format(self.path, self.sha)
 
 
 # TODO separate lib?
@@ -65,35 +66,52 @@ class Api(object):
             {"User-Agent": self.USER_AGENT, "Authorization": "token {}".format(token)}
         )
 
-    def get(self, path, params=None, headers=None):
+    def get(self, path, params=None, headers=None, expect_status=200):
         url = urljoin(self.BASE_REST, path)
         res = self._http.get(url, params=params, headers=headers)
+
+        if res.status_code != expect_status:
+            raise errors.Error("API returned {}".format(res.status_code))
+
         return res
 
     def get_json(self, path, params=None, headers=None):
         return self.get(path, params=params, headers=headers).json()
 
-    def put_json(self, path, data, headers=None):
+    def put_json(self, path, data, headers=None, expect_status=200):
         url = urljoin(self.BASE_REST, path)
-        res = self._http.put(url, json=data, headers=None)
+        res = self._http.put(url, json=data, headers=headers)
+        if res.status_code != expect_status:
+            raise errors.Error("API PUT {} {} {}".format(res.status_code, path, res.json()))
+
         return res.json()
 
-    def post_json(self, path, data, headers=None):
+    def post_json(self, path, data, headers=None, expect_status=200):
         url = urljoin(self.BASE_REST, path)
-        res = self._http.post(url, json=data, headers=None)
+
+        copied = self._http.headers.copy()
+        copied.update(headers)
+        res = self._http.post(url, json=data, headers=copied)
+
+        if res.status_code != expect_status:
+            print(res.headers)
+            raise errors.Error("API POST {} {} {}".format(res.status_code, url, res.json()))
+
         return res.json()
 
     def delete(self, path, params=None, headers=None):
         url = urljoin(self.BASE_REST, path)
         res = self._http.delete(url, params=params, headers=headers)
-        return res
+        if res.status_code != 204:
+            raise errors.Error("API DELETE {} {} {}".format(res.status_code, path, res.json()))
 
     def graphql_query(self, query):
         data = json.dumps({"query": query})
         res = self._http.post(self.BASE_GRAPHQL, data=data)
-        res = res.json()
+        if res.status_code != 200:
+            raise errors.Error("API GraphQL POST {} {}".format(res.status_code, res.json()))
 
-        return res
+        return res.json()
 
 
 class Repo(object):
@@ -133,16 +151,14 @@ class Repo(object):
 
     def contents(self, ref, filepath):
         path = self._base("contents/{}".format(filepath))
-        res = self.api.get_json(path, params={"ref": ref})
-        return res
+        return self.api.get_json(path, params={"ref": ref})
 
     def file(self, ref, filepath):
         return File(self.contents(ref, filepath))
 
     def update_file(self, branch, fileobj, message):
-        path = self._base("contents/{}".format(fileobj.path))
-        res = self.api.put_json(
-            path,
+        return self.api.put_json(
+            self._base("contents/{}".format(fileobj.path)),
             data={
                 "branch": branch,
                 "message": message,
@@ -150,43 +166,52 @@ class Repo(object):
                 "sha": fileobj.sha,
             },
         )
-        return res
+
+    def tag_object(self, sha):
+        return self.api.get_json(self._base("git/tags/{}".format(sha)))
 
     def add_tag(self, name, message, sha):
-        path = self._base("git/tags")
-        res = self.api.post_json(
-            path,
-            data={
-                "tag": name,
-                "message": message,
-                "object": sha,
-                "type": "commit"
+        data={
+            "tag": name,
+            "message": message,
+            "object": sha,
+            "type": "commit"
+        }
+        print(data)
+        return self.api.post_json(
+            self._base("git/tags"),
+            data=data,
+            headers={
+                "accept": "application/vnd.github.v3+json"
             },
+            expect_status=201
         )
         return res
 
+    def delete_tag(self, sha):
+        return self.api.delete(self._base("git/tags/{}".format(sha)))
+
     def add_ref(self, ref, sha):
-        path = self._base("git/refs")
-        res = self.api.post_json(
-            path,
+        return self.api.post_json(
+            self._base("git/refs"),
             data={
                 "ref": ref,
                 "sha": sha
             },
+            headers={
+                "accept": "application/vnd.github.v3+json"
+            },
+            expect_status=201
         )
-        return res
 
-    def delete_tag(self, tagName):
-        path = self._base("git/refs/tags/{}".format(tagName))
-        res = self.api.delete(path)
+    def delete_ref(self, ref):
+        self.api.delete(self._base("git/refs/{}".format(ref)))
 
-        return res.status_code == 204
+    def ref_object(self, ref):
+        return self.api.get_json(self._base("git/ref/{}".format(ref)))
 
     def delete_release(self, number):
-        path = self._base("releases/{}".format(number))
-        res = self.api.delete(path)
-
-        return res.status_code == 204
+        self.api.delete(self._base("releases/{}".format(number)))
 
     def create_release(self, sha, tag, body, name=None, prerelease=False):
         path = self._base("releases")
@@ -199,18 +224,13 @@ class Repo(object):
         if name:
             data["name"] = name
 
-        res = self.api.post_json(path, data)
+        return self.api.post_json(self._base("releases"), data)
 
-        return res
+    def commit_object(self, sha):
+        path = self._base("git/commits/{}".format(sha))
+        res = self.api.get(path)
 
-    # TODO tag object, not ref. does github display this ever?
-    def tag_object(self, commit, name, message):
-        path = self._base("git/tags")
-        sha = commit["sha"]
-        res = self.api.post_json(
-            path, {"type": "commit", "tag": name, "object": sha, "message": message}
-        )
-        return res
+        return res.json()
 
     def commit_check_runs(self, sha):
         path = self._base("commits/{}/check-runs".format(sha))
@@ -294,7 +314,7 @@ class CommitRange(object):
         self._end = end
 
     @property
-    def html_url(self):
+    def compare_url(self):
         url = "https://github.com/{owner}/{name}/compare/{start}...{end}".format(
             owner=self._repo.owner,
             name=self._repo.name,
