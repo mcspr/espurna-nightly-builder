@@ -1,5 +1,7 @@
 # ESPurna Nightly Builder
 [![latest release tag](https://img.shields.io/github/release/mcspr/espurna-nightly-builder/all.svg?label=Latest%20release)](https://github.com/mcspr/espurna-nightly-builder/releases)  
+[![.github/workflows/prepare.yml](https://github.com/mcspr/espurna-nightly-builder/actions/workflows/prepare.yml/badge.svg?branch=builder)](https://github.com/mcspr/espurna-nightly-builder/actions/workflows/prepare.yml)  
+[![.github/workflows/nightly.yml](https://github.com/mcspr/espurna-nightly-builder/actions/workflows/nightly.yml/badge.svg?branch=builder)](https://github.com/mcspr/espurna-nightly-builder/actions/workflows/nightly.yml)  
 [actions logs](https://github.com/mcspr/espurna-nightly-builder/actions)
 
 # Nightly build?
