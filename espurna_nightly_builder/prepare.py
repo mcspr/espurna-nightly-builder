@@ -48,12 +48,6 @@ def prepare(
     if not commit_range.path_changed(source_directory):
         raise errors.NotChanged
 
-    raise errors.Error(
-        "Would've commited old:{} new:{} url:{}".format(
-            old_sha, head_sha, commit_range.compare_url
-        )
-    )
-
     commit_file.content = head_sha
     response = builder_repo.update_file(
         builder_branch, commit_file, commit_range.compare_url
