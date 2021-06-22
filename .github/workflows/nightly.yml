@@ -24,8 +24,10 @@ jobs:
 
       - id: commit
         run: |
-          # TODO: echo "SOMETHING=$(exit 1)" does not trigger an error based on the exit code
-          tag=$(git log --date="format:%Y%m%d" --format"%ad" -n 1)
+          # TODO: echo "SOMETHING=$(exit 1)" will not stop
+          # the action based on the exit code inside of $(...)
+          # Setting variables like this will though.
+          tag=$(git log --date="format:%Y%m%d" --format="%ad" -n 1)
           echo "::set-output name=tag::"$tag
 
           head=$(git show HEAD:commit.txt)
