@@ -82,7 +82,9 @@ class Api(object):
         url = urljoin(self.BASE_REST, path)
         res = self._http.put(url, json=data, headers=headers)
         if res.status_code != expect_status:
-            raise errors.Error("API PUT {} {} {}".format(res.status_code, path, res.json()))
+            raise errors.Error(
+                "API PUT {} {} {}".format(res.status_code, path, res.json())
+            )
 
         return res.json()
 
@@ -95,7 +97,9 @@ class Api(object):
 
         if res.status_code != expect_status:
             print(res.headers)
-            raise errors.Error("API POST {} {} {}".format(res.status_code, url, res.json()))
+            raise errors.Error(
+                "API POST {} {} {}".format(res.status_code, url, res.json())
+            )
 
         return res.json()
 
@@ -103,13 +107,17 @@ class Api(object):
         url = urljoin(self.BASE_REST, path)
         res = self._http.delete(url, params=params, headers=headers)
         if res.status_code != 204:
-            raise errors.Error("API DELETE {} {} {}".format(res.status_code, path, res.json()))
+            raise errors.Error(
+                "API DELETE {} {} {}".format(res.status_code, path, res.json())
+            )
 
     def graphql_query(self, query):
         data = json.dumps({"query": query})
         res = self._http.post(self.BASE_GRAPHQL, data=data)
         if res.status_code != 200:
-            raise errors.Error("API GraphQL POST {} {}".format(res.status_code, res.json()))
+            raise errors.Error(
+                "API GraphQL POST {} {}".format(res.status_code, res.json())
+            )
 
         return res.json()
 
@@ -171,20 +179,13 @@ class Repo(object):
         return self.api.get_json(self._base("git/tags/{}".format(sha)))
 
     def add_tag(self, name, message, sha):
-        data={
-            "tag": name,
-            "message": message,
-            "object": sha,
-            "type": "commit"
-        }
+        data = {"tag": name, "message": message, "object": sha, "type": "commit"}
         print(data)
         return self.api.post_json(
             self._base("git/tags"),
             data=data,
-            headers={
-                "accept": "application/vnd.github.v3+json"
-            },
-            expect_status=201
+            headers={"accept": "application/vnd.github.v3+json"},
+            expect_status=201,
         )
         return res
 
@@ -194,14 +195,9 @@ class Repo(object):
     def add_ref(self, ref, sha):
         return self.api.post_json(
             self._base("git/refs"),
-            data={
-                "ref": ref,
-                "sha": sha
-            },
-            headers={
-                "accept": "application/vnd.github.v3+json"
-            },
-            expect_status=201
+            data={"ref": ref, "sha": sha},
+            headers={"accept": "application/vnd.github.v3+json"},
+            expect_status=201,
         )
 
     def delete_ref(self, ref):

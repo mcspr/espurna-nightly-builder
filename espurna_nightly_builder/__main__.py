@@ -102,16 +102,16 @@ def f_testtagging(args):
 
     ref_string = "tags/{}".format(args.tag)
 
-    print('creating tag', args.tag)
-    print('for sha', args.sha)
+    print("creating tag", args.tag)
+    print("for sha", args.sha)
 
     tag = builder_repo.add_tag(args.tag, "some tag message", args.sha)
 
-    print('creating ref', ref_string)
+    print("creating ref", ref_string)
     builder_repo.add_ref("refs/{}".format(ref_string), tag["sha"])
 
-    print('tag sha is', tag["sha"])
-    print('created tag for', tag["object"]["sha"])
+    print("tag sha is", tag["sha"])
+    print("created tag for", tag["object"]["sha"])
 
     print("waiting...")
     input()
@@ -132,14 +132,14 @@ def f_mkoutputs(args):
     tag = builder_repo.tag_object(ref["object"]["sha"])
     commit = builder_repo.commit_object(tag["object"]["sha"])
 
-    print('tag is', args.tag)
-    print('tag sha', tag["sha"])
-    print('points to commit', commit["sha"])
-    print('tag message is', tag["message"])
-    print('commit message is', commit["message"])
+    print("tag is", args.tag)
+    print("tag sha", tag["sha"])
+    print("points to commit", commit["sha"])
+    print("tag message is", tag["message"])
+    print("commit message is", commit["message"])
 
     nightly_commit = builder_repo.file(commit["sha"], args.commit_filename)
-    print('target commit is', nightly_commit.content)
+    print("target commit is", nightly_commit.content)
 
 
 def setup_argparse():
