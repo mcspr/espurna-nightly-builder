@@ -22,7 +22,13 @@ jobs:
         with:
           ref: builder
 
-      - env:
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('setup.py', 'setup.cfg') }}
+
+      - name: Prepare commit.txt
+        env:
           GITHUB_TOKEN: ${{ secrets.BUILDER_TOKEN }}
         run: |
           # ref. pypa/pip#8180
