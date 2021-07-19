@@ -1,12 +1,9 @@
 name: Nightly
 
-#on:
-#  push:
-#    branches: [nightly]
-#    paths: commit.txt
-
 on:
-  workflow_dispatch:
+  push:
+    branches: [nightly]
+    paths: commit.txt
 
 jobs:
   nightly:
