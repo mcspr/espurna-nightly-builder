@@ -1,9 +1,12 @@
 name: Nightly
 
 on:
+  workflow_dispatch:
   push:
-    branches: [nightly]
-    paths: commit.txt
+    branches:
+      - "nightly"
+    tags-ignore:
+      - "**"
 
 jobs:
   nightly:
