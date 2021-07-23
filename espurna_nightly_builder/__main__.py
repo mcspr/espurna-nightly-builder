@@ -47,6 +47,12 @@ def f_prepare(args):
     )
 
 
+def f_workflow(args):
+    builder_repo = Repo(args.builder_repo, api=api_client(args))
+    builder_repo.workflow_dispatch(workflow_id=args.id, ref=args.ref)
+    log.info("dispatched workflow:%s for ref:%s", args.id, args.ref)
+
+
 def f_setup_repo(args):
     setup_repo(branch=args.builder_branch, commit_filename=args.commit_filename)
 
@@ -179,6 +185,12 @@ def setup_argparse():
     cmd_show_latest = subparser.add_parser("show-latest")
     cmd_show_latest.add_argument("builder_repo")
     cmd_show_latest.set_defaults(func=f_show_latest)
+
+    cmd_workflow = subparser.add_parser("workflow")
+    cmd_workflow.add_argument("--id", required=True)
+    cmd_workflow.add_argument("--ref", required=True)
+    cmd_workflow.add_argument("builder_repo")
+    cmd_workflow.set_defaults(func=f_workflow)
 
     cmd_test = subparser.add_parser("test-tagging")
     cmd_test.add_argument("--tag")

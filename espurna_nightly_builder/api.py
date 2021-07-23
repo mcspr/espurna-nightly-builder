@@ -238,6 +238,15 @@ class Repo(object):
         res = self.api.get_json(path)
         return res
 
+    def workflow_dispatch(self, workflow_id, ref):
+        path = self._base("actions/workflows/{}/dispatches".format(workflow_id))
+        return self.api.post_json(
+            path,
+            data = {"ref": ref},
+            headers={"accept": "application/vnd.github.v3+json"},
+            expect_status=204,
+        )
+
     def releases(self, last=1):
         query = """
         query {

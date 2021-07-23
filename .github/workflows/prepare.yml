@@ -29,14 +29,26 @@ jobs:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('setup.py', 'setup.cfg') }}
 
-      - name: Prepare commit.txt
-        env:
-          GITHUB_TOKEN: ${{ secrets.BUILDER_TOKEN }}
+      - name: Install builder
         run: |
           # ref. pypa/pip#8180
           # default ubuntu install does not include wheel, thus... install it right here
           python -mpip install -U pip wheel
           pip install .
+
+      - name: Prepare commit.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.BUILDER_TOKEN }}
+        run: |
           # personalized token is required, since we trigger a commit on success
           # and gh actions won't trigger another event when it is the default one
           espurna_nightly prepare ${{ github.event.inputs.target_repo }} ${{ github.repository }}
+
+      - name: Dispatch Nightly
+        env:
+          GITHUB_TOKEN: ${{ secrets.BUILDER_TOKEN }}
+        run: |
+          # TODO: dispatch target repo variable
+          # since the `nightly` branch lacks any contents besides commit.txt, workflow event won't be handled correctly
+          # ref. https://docs.github.com/en/actions/reference/events-that-trigger-workflows#configuring-workflow-events
+          espurna_nightly workflow --id nightly.yml --ref builder ${{ github.repository }}
