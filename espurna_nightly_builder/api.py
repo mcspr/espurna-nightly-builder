@@ -119,7 +119,13 @@ class Api(object):
                 "API GraphQL POST {} {}".format(res.status_code, res.json())
             )
 
-        return res.json()
+        data = res.json()
+        if "errors" in data.keys():
+            raise errors.Error(
+                "API GraphQL POST errors: {}".format(",".join(error["message"] for error in data["errors"]))
+            )
+
+        return data
 
 
 class Repo(object):
@@ -187,7 +193,6 @@ class Repo(object):
             headers={"accept": "application/vnd.github.v3+json"},
             expect_status=201,
         )
-        return res
 
     def delete_tag(self, sha):
         return self.api.delete(self._base("git/tags/{}".format(sha)))
@@ -242,39 +247,33 @@ class Repo(object):
         path = self._base("actions/workflows/{}/dispatches".format(workflow_id))
         return self.api.post_json(
             path,
-            data = {"ref": ref},
+            data={"ref": ref},
             headers={"accept": "application/vnd.github.v3+json"},
             expect_status=204,
         )
 
     def releases(self, last=1):
-        query = """
-        query {
-            repository(owner:"OWNER", name:"NAME") {
-                releases(last:LAST) {
-                    nodes {
+        template = """
+        query {{
+            repository(owner:"{owner}", name:"{name}") {{
+                releases(last:{last}) {{
+                    nodes {{
                         id
                         url
                         publishedAt
-                        tag {
+                        tag {{
                             name
-                            target {
+                            target {{
                                 oid
                                 commitUrl
-                            }
-                        }
-                    }
-                }
-            }
-        }"""
-        query = (
-            query.replace("OWNER", self.owner)
-            .replace("NAME", self.name)
-            .replace("LAST", str(last))
-            .strip()
-        )
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+        }}"""
 
-        res = self.api.graphql_query(query)
+        res = self.api.graphql_query(template.format(owner=self.owner, name=self.name, last=last).strip())
         releases = res["data"]["repository"]["releases"]["nodes"]
 
         for release in releases:

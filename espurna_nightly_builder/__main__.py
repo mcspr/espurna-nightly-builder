@@ -59,9 +59,20 @@ def f_setup_repo(args):
 
 def f_list_tags(args):
     builder_repo = Repo(args.builder_repo, api=api_client(args))
+    for tag in builder_repo.tags():
+        log.info("%s", tag["name"])
 
-    tags = builder_repo.tags()
-    log.info("tags:\n%s", "\n".join([tag["name"] for tag in tags]))
+
+def f_list_releases(args):
+    builder_repo = Repo(args.builder_repo, api=api_client(args))
+    for release in builder_repo.releases(args.last):
+        log.info(
+            "%s number:%d tag:%s sha:%s",
+            release["publishedAt"],
+            release["number"],
+            release["tagName"],
+            release["sha"],
+        )
 
 
 def f_delete_releases(args):
@@ -171,6 +182,11 @@ def setup_argparse():
     cmd_list_tags = subparser.add_parser("list-tags")
     cmd_list_tags.add_argument("builder_repo")
     cmd_list_tags.set_defaults(func=f_list_tags)
+
+    cmd_list_releases = subparser.add_parser("list-releases")
+    cmd_list_releases.add_argument("--last", type=int, default=1)
+    cmd_list_releases.add_argument("builder_repo")
+    cmd_list_releases.set_defaults(func=f_list_releases)
 
     cmd_delete = subparser.add_parser("delete-releases")
     cmd_delete.add_argument("--prefix", default=last_month_prefix())
