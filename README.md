@@ -12,24 +12,24 @@ Unlike official releases, binaries are created from latest commit to the [`dev`]
 # Technical info
 [Scheduled events](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events) are used to trigger the build. See [.github/workflows/prepare.yml](https://github.com/mcspr/espurna-nightly-builder/blob/builder/.github/workflows/prepare.yml), [.github/workflows/nightly.yml](https://github.com/mcspr/espurna-nightly-builder/blob/builder/.github/workflows/nightly.yml) and [espurna\_nightly\_builder helper scripts](https://github.com/mcspr/espurna-nightly-builder/tree/builder/espurna_nightly_builder).
 
-Nightly process is split into 2 stages - Preparation and Release.
+Both workflows can be triggered with [a workflow\_dispatch event](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#manual-events).
 
-## Preparation
+## prepare.yml
 
 See [.github/workflows/prepare.yml](https://github.com/mcspr/espurna-nightly-builder/blob/builder/.github/workflows/prepare.yml)  
 
-This workflow is triggered on a schedule. Unless the following tests pass, this stage will result in an error:
-- The commit that 'dev' points at is different from the 'commit.txt' contents.
+This workflow is (supposed to be) triggered on a schedule. Unless the following tests pass, this stage will result in an error:
+- The commit that 'dev' branch points at is different from the 'commit.txt' contents.
 - All [Checks](https://docs.github.com/en/rest/reference/checks) of the target repository 'dev' branch are successful.
 - 'master' branch does not point to the same commit as 'dev', as we don't want to re-do the official release.
 
 Finally, the ['commit.txt'](https://github.com/mcspr/espurna-nightly-builder/blob/nightly/commit.txt) is updated with the latest SHA value of the 'dev' branch.
 
-## Release
+## nightly.yml
 
 See [.github/workflows/nightly.yml](https://github.com/mcspr/espurna-nightly-builder/blob/builder/.github/workflows/nightly.yml)  
 
-This workflow can be triggered either after the 'nightly' branch is updated or [it is manually triggered by the user](https://docs.github.com/en/actions/reference/events-that-trigger-workflows#manual-events). his state is triggered from either the When nightly branch is updated.
+When 'prepare.yml' is successful or user triggers the workflow manually:
 - 'nightly' branch is fetched with fetch depth 2, and HEAD and HEAD~1 'commit.txt' contents are saved.
 - Target repository is fetched using the HEAD commit and the [generate\_release\_sh.py](https://github.com/xoseperez/espurna/blob/dev/code/scripts/generate_release_sh.py) script is called (which is also used to build the official releases)
 - New pre-release is created with a tag YYYYMMDD, based on the latest modification date of the 'commit.txt'. Body should contain the HEAD~1...HEAD comparison URL.

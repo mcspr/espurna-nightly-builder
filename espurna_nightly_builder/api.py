@@ -122,7 +122,9 @@ class Api(object):
         data = res.json()
         if "errors" in data.keys():
             raise errors.Error(
-                "API GraphQL POST errors: {}".format(",".join(error["message"] for error in data["errors"]))
+                "API GraphQL POST errors: {}".format(
+                    ",".join(error["message"] for error in data["errors"])
+                )
             )
 
         return data
@@ -243,11 +245,14 @@ class Repo(object):
         res = self.api.get_json(path)
         return res
 
-    def workflow_dispatch(self, workflow_id, ref):
+    def workflow_dispatch(self, workflow_id, ref, inputs=None):
         path = self._base("actions/workflows/{}/dispatches".format(workflow_id))
+        data = {"ref": ref}
+        if inputs:
+            data = inputs
         return self.api.post_json(
             path,
-            data={"ref": ref},
+            data=data,
             headers={"accept": "application/vnd.github.v3+json"},
             expect_status=204,
         )
@@ -273,7 +278,9 @@ class Repo(object):
             }}
         }}"""
 
-        res = self.api.graphql_query(template.format(owner=self.owner, name=self.name, last=last).strip())
+        res = self.api.graphql_query(
+            template.format(owner=self.owner, name=self.name, last=last).strip()
+        )
         releases = res["data"]["repository"]["releases"]["nodes"]
 
         for release in releases:

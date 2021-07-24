@@ -1,14 +1,10 @@
 name: Prepare
 
-#on:
-#  schedule:
-#    cron: '0 7 * * *'
-
 on:
   workflow_dispatch:
     inputs:
       target_repo:
-        description: 'Repo to compare with'
+        description: 'Target repository'
         required: true
         default: xoseperez/espurna
 
@@ -51,4 +47,4 @@ jobs:
           # TODO: dispatch target repo variable
           # since the `nightly` branch lacks any contents besides commit.txt, workflow event won't be handled correctly
           # ref. https://docs.github.com/en/actions/reference/events-that-trigger-workflows#configuring-workflow-events
-          espurna_nightly workflow --id nightly.yml --ref builder ${{ github.repository }}
+          espurna_nightly workflow --id nightly.yml --ref builder ${{ github.event.inputs.target_repo }} ${{ github.repository }}

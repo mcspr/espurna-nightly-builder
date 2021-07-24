@@ -2,6 +2,11 @@ name: Nightly
 
 on:
   workflow_dispatch:
+    inputs:
+      target_repo:
+        description: 'Target repository'
+        required: true
+        default: xoseperez/espurna
 
 jobs:
   nightly:
@@ -17,7 +22,8 @@ jobs:
           fetch-depth: 2
           ref: nightly
 
-      - id: commit
+      - name: Parse nightly branch log and contents
+        id: commit
         run: |
           # TODO: echo "SOMETHING=$(exit 1)" will not stop
           # the action based on the exit code inside of $(...)
@@ -45,7 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          repository: xoseperez/espurna
+          repository: ${{ github.event.inputs.target_repo }}
           path: espurna
           ref: ${{ needs.nightly.outputs.head }}
 
@@ -125,6 +131,6 @@ jobs:
           tag: ${{ needs.nightly.outputs.tag }}
           commit: ${{ needs.nightly.outputs.commit }}
           name: Nightly build (${{ needs.nightly.outputs.tag }})
-          body: https://github.com/xoseperez/espurna/compare/${{ needs.nightly.outputs.previous }}...${{ needs.nightly.outputs.head }}
+          body: https://github.com/${{ github.event.inputs.target_repo }}/compare/${{ needs.nightly.outputs.previous }}...${{ needs.nightly.outputs.head }}
           prerelease: true
           artifacts: "binaries/*.bin"

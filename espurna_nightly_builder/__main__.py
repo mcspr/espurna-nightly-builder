@@ -49,8 +49,15 @@ def f_prepare(args):
 
 def f_workflow(args):
     builder_repo = Repo(args.builder_repo, api=api_client(args))
-    builder_repo.workflow_dispatch(workflow_id=args.id, ref=args.ref)
-    log.info("dispatched workflow:%s for ref:%s", args.id, args.ref)
+    builder_repo.workflow_dispatch(
+        workflow_id=args.id, ref=args.ref, inputs={"target_repo": args.target_repo}
+    )
+    log.info(
+        "dispatched workflow:%s for ref:%s input target_repo:%s",
+        args.id,
+        args.ref,
+        args.target_repo,
+    )
 
 
 def f_setup_repo(args):
@@ -205,6 +212,7 @@ def setup_argparse():
     cmd_workflow = subparser.add_parser("workflow")
     cmd_workflow.add_argument("--id", required=True)
     cmd_workflow.add_argument("--ref", required=True)
+    cmd_workflow.add_argument("target_repo")
     cmd_workflow.add_argument("builder_repo")
     cmd_workflow.set_defaults(func=f_workflow)
 
