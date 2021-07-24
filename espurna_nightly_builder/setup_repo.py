@@ -17,3 +17,12 @@ def setup_repo(branch, commit_filename):
     subprocess.call(["git", "add", commit_filename])
     subprocess.call(["git", "commit", "-m", "initial commit"])
     subprocess.call(["git", "push", "-u", "origin", branch])
+
+
+class SetupRepo:
+    command = "setup-repo"
+    __doc__ = setup_repo.__doc__
+
+    @staticmethod
+    def function(args):
+        setup_repo(branch=args.builder_branch, commit_filename=args.commit_filename)

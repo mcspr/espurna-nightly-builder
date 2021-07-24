@@ -57,3 +57,27 @@ def prepare(
             response["commit"]["sha"]
         )
     )
+
+
+class Prepare:
+    command = "prepare"
+    __doc__ = prepare.__doc__
+
+    @staticmethod
+    def setup(parser):
+        parser.add_argument("--source-directory", default="code/")
+        parser.add_argument("target_repo")
+        parser.add_argument("builder_repo")
+
+    @staticmethod
+    def function(args):
+        target_repo = Repo(args.target_repo, api=api_client(args))
+        builder_repo = Repo(args.builder_repo, api=api_client(args))
+        prepare(
+            target_repo,
+            builder_repo,
+            target_branch=args.target_branch,
+            builder_branch=args.builder_branch,
+            source_directory=args.source_directory,
+            commit_filename=args.commit_filename,
+        )
