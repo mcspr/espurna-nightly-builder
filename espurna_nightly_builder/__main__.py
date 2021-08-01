@@ -32,7 +32,6 @@ def api_client(args):
         api_client.instance = Api(args.token)
 
     return api_client.instance
-    subparser = parser.add_subparsers()
 
 
 class Workflow:
@@ -42,15 +41,13 @@ class Workflow:
 
     command = "workflow"
 
-    @staticmethod
-    def setup(parser):
+    def __init__(self, parser):
         parser.add_argument("--id", required=True)
         parser.add_argument("--ref", required=True)
         parser.add_argument("target_repo")
         parser.add_argument("builder_repo")
 
-    @staticmethod
-    def function(args):
+    def __call__(self, args):
         builder_repo = Repo(args.builder_repo, api=api_client(args))
         builder_repo.workflow_dispatch(
             workflow_id=args.id, ref=args.ref, inputs={"target_repo": args.target_repo}
@@ -66,12 +63,10 @@ class Workflow:
 class ListTags:
     command = "list-tags"
 
-    @staticmethod
-    def setup(parser):
+    def __init__(self, parser):
         parser.add_argument("builder_repo")
 
-    @staticmethod
-    def function(args):
+    def __call__(self, args):
         builder_repo = Repo(args.builder_repo, api=api_client(args))
         for tag in builder_repo.tags():
             log.info("%s", tag["name"])
@@ -80,13 +75,11 @@ class ListTags:
 class ListReleases:
     command = "list-releases"
 
-    @staticmethod
-    def setup(parser):
+    def __init__(self, parser):
         parser.add_argument("--last", type=int, default=1)
         parser.add_argument("builder_repo")
 
-    @staticmethod
-    def function(args):
+    def __call__(self, args):
         builder_repo = Repo(args.builder_repo, api=api_client(args))
         for release in builder_repo.releases(args.last):
             log.info(
@@ -101,13 +94,11 @@ class ListReleases:
 class DeleteReleases:
     command = "delete-releases"
 
-    @staticmethod
-    def setup(parser):
+    def __init__(self, parser):
         parser.add_argument("--prefix", default=last_month_prefix())
         parser.add_argument("builder_repo")
 
-    @staticmethod
-    def function(args):
+    def __call__(self, args):
         builder_repo = Repo(args.builder_repo, api=api_client(args))
         prefix = args.prefix
         tags = builder_repo.tags()
@@ -135,8 +126,10 @@ class DeleteReleases:
 class ShowLatest:
     command = "show-latest"
 
-    @staticmethod
-    def function(args):
+    def __init__(self, parser):
+        parser.add_argument("builder_repo")
+
+    def __call__(self, args):
         builder_repo = Repo(args.builder_repo, api=api_client(args))
 
         head = builder_repo.branches(args.builder_branch)
@@ -147,22 +140,13 @@ class ShowLatest:
         target_commit = builder_repo.file(sha, args.commit_filename).content
         log.info("head target:%s", target_commit)
 
-    @staticmethod
-    def setup(parser):
-        parser.add_argument("builder_repo")
 
-
-def setup_parser_handlers(parser, handlers):
+def setup_parser_handlers(root_parser, handlers):
     for handler in handlers:
-        handler_parser = parser.add_parser(
+        parser = root_parser.add_parser(
             handler.command, help=handler.__doc__ or None
         )
-
-        setup = getattr(handler, "setup", None)
-        if setup:
-            setup(handler_parser)
-
-        handler_parser.set_defaults(func=handler.function)
+        handler_parser.set_defaults(func=handler(parser))
 
 
 def setup_argparse():

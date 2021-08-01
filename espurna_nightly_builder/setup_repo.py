@@ -23,6 +23,8 @@ class SetupRepo:
     command = "setup-repo"
     __doc__ = setup_repo.__doc__
 
-    @staticmethod
-    def function(args):
+    def __init__(self, parser):
+        pass
+
+    def __call__(self, args):
         setup_repo(branch=args.builder_branch, commit_filename=args.commit_filename)

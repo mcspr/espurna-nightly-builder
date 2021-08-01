@@ -1,7 +1,7 @@
 import logging
 
 from . import errors
-from .api import release_is_head, CommitRange
+from .api import release_is_head, Repo, CommitRange
 from .util import nightly_tag
 
 log = logging.getLogger(__name__)
@@ -63,14 +63,12 @@ class Prepare:
     command = "prepare"
     __doc__ = prepare.__doc__
 
-    @staticmethod
-    def setup(parser):
+    def __init__(self, parser):
         parser.add_argument("--source-directory", default="code/")
         parser.add_argument("target_repo")
         parser.add_argument("builder_repo")
 
-    @staticmethod
-    def function(args):
+    def __call__(self, args):
         target_repo = Repo(args.target_repo, api=api_client(args))
         builder_repo = Repo(args.builder_repo, api=api_client(args))
         prepare(
