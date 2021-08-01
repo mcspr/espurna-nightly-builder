@@ -249,7 +249,7 @@ class Repo(object):
         path = self._base("actions/workflows/{}/dispatches".format(workflow_id))
         data = {"ref": ref}
         if inputs:
-            data = inputs
+            data["inputs"] = inputs
         return self.api.post_json(
             path,
             data=data,
