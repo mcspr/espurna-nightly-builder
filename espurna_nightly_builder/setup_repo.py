@@ -8,8 +8,8 @@ def setup_repo(branch, commit_filename):
 
     os.mkdir(branch)
     os.chdir(branch)
-    with open(commit_filename, "w") as f:
-        f.write("-")
+    with open(commit_filename, "w") as commit_txt:
+        commit_txt.write("-")
 
     subprocess.call(["git", "init"])
     subprocess.call(["git", "remote", "add", "origin", origin_url])

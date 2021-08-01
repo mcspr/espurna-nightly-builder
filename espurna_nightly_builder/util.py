@@ -4,6 +4,9 @@ import datetime
 from subprocess import check_output
 
 
+from .api import Repo, Api
+
+
 def run(cmd, cwd=None):
     out = check_output(cmd, cwd=cwd)
     out = out.decode(sys.getfilesystemencoding()).strip()
@@ -28,3 +31,16 @@ def last_month_prefix():
     last = date.replace(day=1) - delta
 
     return last.strftime("%Y%m")
+
+
+# helpers to generate Repo object
+def builder_repo_from_args(args):
+    return Repo(args.builder_repo, api=Api(args.token))
+
+
+def target_repo_from_args(args):
+    return Repo(args.target_repo, api=Api(args.token))
+
+
+def repos_from_args(args):
+    return [target_repo_from_args(args), builder_repo_from_args(args)]

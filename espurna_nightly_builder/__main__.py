@@ -5,10 +5,9 @@ import sys
 
 
 from . import errors
-from .api import Repo, Api, CommitRange
 from .prepare import Prepare
 from .setup_repo import SetupRepo
-from .util import nightly_tag, last_month_prefix
+from .util import last_month_prefix, builder_repo_from_args
 
 
 logging.basicConfig(
@@ -19,19 +18,12 @@ log = logging.getLogger("main")
 
 def exc_handler(exc_type, exc_value, exc_trace):
     if issubclass(exc_type, errors.Error):
-        log.error('Exiting: "{}"'.format(exc_value))
+        log.error('Exiting: "%s"', exc_value)
     else:
         log.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_trace))
 
 
 sys.excepthook = exc_handler
-
-
-def api_client(args):
-    if not hasattr(api_client, "instance"):
-        api_client.instance = Api(args.token)
-
-    return api_client.instance
 
 
 class Workflow:
@@ -48,7 +40,7 @@ class Workflow:
         parser.add_argument("builder_repo")
 
     def __call__(self, args):
-        builder_repo = Repo(args.builder_repo, api=api_client(args))
+        builder_repo = builder_repo_from_args(args)
         builder_repo.workflow_dispatch(
             workflow_id=args.id, ref=args.ref, inputs={"target_repo": args.target_repo}
         )
@@ -67,7 +59,7 @@ class ListTags:
         parser.add_argument("builder_repo")
 
     def __call__(self, args):
-        builder_repo = Repo(args.builder_repo, api=api_client(args))
+        builder_repo = builder_repo_from_args(args)
         for tag in builder_repo.tags():
             log.info("%s", tag["name"])
 
@@ -80,7 +72,7 @@ class ListReleases:
         parser.add_argument("builder_repo")
 
     def __call__(self, args):
-        builder_repo = Repo(args.builder_repo, api=api_client(args))
+        builder_repo = builder_repo_from_args(args)
         for release in builder_repo.releases(args.last):
             log.info(
                 "%s number:%d tag:%s sha:%s",
@@ -99,7 +91,7 @@ class DeleteReleases:
         parser.add_argument("builder_repo")
 
     def __call__(self, args):
-        builder_repo = Repo(args.builder_repo, api=api_client(args))
+        builder_repo = builder_repo_from_args(args)
         prefix = args.prefix
         tags = builder_repo.tags()
 
@@ -130,7 +122,7 @@ class ShowLatest:
         parser.add_argument("builder_repo")
 
     def __call__(self, args):
-        builder_repo = Repo(args.builder_repo, api=api_client(args))
+        builder_repo = builder_repo_from_args(args)
 
         head = builder_repo.branches(args.builder_branch)
         sha = head["commit"]["sha"]
@@ -143,10 +135,8 @@ class ShowLatest:
 
 def setup_parser_handlers(root_parser, handlers):
     for handler in handlers:
-        parser = root_parser.add_parser(
-            handler.command, help=handler.__doc__ or None
-        )
-        handler_parser.set_defaults(func=handler(parser))
+        parser = root_parser.add_parser(handler.command, help=handler.__doc__ or None)
+        parser.set_defaults(func=handler(parser))
 
 
 def setup_argparse():

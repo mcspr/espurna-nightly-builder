@@ -3,14 +3,16 @@ import re
 import json
 import logging
 import base64
+import http.client
 
 try:
     from urllib.parse import urljoin
 except ImportError:
     from urlparse import urljoin
 
-from . import errors
 import requests
+
+from . import errors
 
 
 log = logging.getLogger(__name__)
@@ -18,8 +20,6 @@ log = logging.getLogger(__name__)
 
 # log sent requests. received data isn't shown
 def enable_requests_debug():
-    import http.client
-
     http.client.HTTPConnection.debuglevel = 1
 
     log.setLevel(logging.DEBUG)
@@ -29,7 +29,7 @@ def enable_requests_debug():
     requests_log.propagate = True
 
 
-class File(object):
+class File:
     def __init__(self, data, enc="ascii"):
         self.name = data["name"]
         self.path = data["path"]
@@ -51,8 +51,7 @@ class File(object):
         return '<File path="{}" sha={}>'.format(self.path, self.sha)
 
 
-# TODO separate lib?
-class Api(object):
+class Api:
 
     BASE_REST = "https://api.github.com/"
     BASE_GRAPHQL = "https://api.github.com/graphql"
@@ -130,7 +129,7 @@ class Api(object):
         return data
 
 
-class Repo(object):
+class Repo:
     def __init__(self, slug, api):
         self.slug = slug
         self.api = api
@@ -140,7 +139,6 @@ class Repo(object):
         self.owner = owner
         self.name = name
 
-    # TODO uritemplate?
     def _base(self, path):
         return "{}/{}".format(self.base, path)
 
@@ -217,7 +215,6 @@ class Repo(object):
         self.api.delete(self._base("releases/{}".format(number)))
 
     def create_release(self, sha, tag, body, name=None, prerelease=False):
-        path = self._base("releases")
         data = {
             "tag_name": tag,
             "target_commitish": sha,
@@ -283,13 +280,13 @@ class Repo(object):
         )
         releases = res["data"]["repository"]["releases"]["nodes"]
 
+        # wonderful implementation detail, graphql encodes the real numeric ID for some reason
         for release in releases:
-            # XXX is this reliable?
-            id = release["id"]
+            release_id = release["id"]
             del release["id"]
-            id = base64.b64decode(id.encode("ascii")).decode("ascii")
-            number = id.partition("Release")[-1]
-            release["number"] = int(number)
+
+            release_id = base64.b64decode(id.encode("ascii")).decode("ascii")
+            release["number"] = int(release_id.partition("Release")[-1])
 
             if release["tag"]:
                 sha = release["tag"]["target"]["oid"]
@@ -307,7 +304,7 @@ class Repo(object):
         return self.releases(last=1)[0]
 
 
-class CommitRange(object):
+class CommitRange:
 
     RE_BINARY_FILES = re.compile(
         r"^Binary files (?P<source_filename>[^\t\n]+) and (?P<target_filename>[^\t\n]+) differ"

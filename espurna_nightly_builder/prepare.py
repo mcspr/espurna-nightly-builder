@@ -1,8 +1,8 @@
 import logging
 
 from . import errors
-from .api import release_is_head, Repo, CommitRange
-from .util import nightly_tag
+from .api import release_is_head, CommitRange
+from .util import nightly_tag, repos_from_args
 
 log = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ def prepare(
     head = target_repo.branches(target_branch)
     head_sha = head["commit"]["sha"]
 
-    log.info("head commit: {}".format(head_sha))
+    log.info("head commit: %s", head_sha)
     if release_is_head(target_repo, head_sha):
         raise errors.TargetReleased
 
@@ -40,7 +40,7 @@ def prepare(
 
     old_sha = commit_file.content
 
-    log.info("latest nightly: {}".format(old_sha))
+    log.info("latest nightly: %s", old_sha)
     if old_sha == head_sha:
         raise errors.Released
 
@@ -53,9 +53,7 @@ def prepare(
         builder_branch, commit_file, "Nightly build ({})".format(nightly_tag())
     )
     log.info(
-        "updated commit.txt, new nightly branch commit: {}".format(
-            response["commit"]["sha"]
-        )
+        "updated commit.txt, new nightly branch commit: %s", response["commit"]["sha"]
     )
 
 
@@ -69,8 +67,7 @@ class Prepare:
         parser.add_argument("builder_repo")
 
     def __call__(self, args):
-        target_repo = Repo(args.target_repo, api=api_client(args))
-        builder_repo = Repo(args.builder_repo, api=api_client(args))
+        target_repo, builder_repo = repos_from_args(args)
         prepare(
             target_repo,
             builder_repo,

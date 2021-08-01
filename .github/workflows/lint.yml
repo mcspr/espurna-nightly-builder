@@ -1,0 +1,31 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - builder
+
+jobs:
+  lint:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('setup.py', 'setup.cfg') }}
+
+      - name: Install lint tools
+        run: |
+          python -mpip install -U pip wheel
+          pip install -e .[lint]
+
+      - name: Checks
+        run: |
+          black --check espurna_nightly_builder
+          pylint espurna_nightly_builder
