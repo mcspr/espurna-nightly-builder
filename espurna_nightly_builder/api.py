@@ -280,12 +280,12 @@ class Repo:
         )
         releases = res["data"]["repository"]["releases"]["nodes"]
 
-        # wonderful implementation detail, graphql encodes the real numeric ID for some reason
         for release in releases:
+            # wonderful implementation detail, graphql encodes the real numeric ID for some reason
             release_id = release["id"]
             del release["id"]
 
-            release_id = base64.b64decode(id.encode("ascii")).decode("ascii")
+            release_id = base64.b64decode(release_id.encode("ascii")).decode("ascii")
             release["number"] = int(release_id.partition("Release")[-1])
 
             if release["tag"]:
