@@ -51,6 +51,19 @@ class File:
         return '<File path="{}" sha={}>'.format(self.path, self.sha)
 
 
+def simple_response_error(response):
+    try:
+        content = response.json()
+    except json.decoder.JSONDecodeError:
+        content = "(no json content)"
+
+    return errors.Error(
+        "API {} {} {}: {}".format(
+            response.request.method, response.status_code, response.request.url, content
+        )
+    )
+
+
 class Api:
 
     BASE_REST = "https://api.github.com/"
@@ -70,7 +83,7 @@ class Api:
         res = self._http.get(url, params=params, headers=headers)
 
         if res.status_code != expect_status:
-            raise errors.Error("API returned {}".format(res.status_code))
+            raise simple_response_error(res)
 
         return res
 
@@ -81,9 +94,7 @@ class Api:
         url = urljoin(self.BASE_REST, path)
         res = self._http.put(url, json=data, headers=headers)
         if res.status_code != expect_status:
-            raise errors.Error(
-                "API PUT {} {} {}".format(res.status_code, path, res.json())
-            )
+            raise simple_response_error(res)
 
         return res.json()
 
@@ -95,10 +106,10 @@ class Api:
         res = self._http.post(url, json=data, headers=copied)
 
         if res.status_code != expect_status:
-            print(res.headers)
-            raise errors.Error(
-                "API POST {} {} {}".format(res.status_code, url, res.json())
-            )
+            raise simple_response_error(res)
+
+        if res.status_code == 204:
+            return None
 
         return res.json()
 
@@ -106,17 +117,16 @@ class Api:
         url = urljoin(self.BASE_REST, path)
         res = self._http.delete(url, params=params, headers=headers)
         if res.status_code != 204:
-            raise errors.Error(
-                "API DELETE {} {} {}".format(res.status_code, path, res.json())
-            )
+            raise simple_response_error(res)
 
     def graphql_query(self, query):
         data = json.dumps({"query": query})
         res = self._http.post(self.BASE_GRAPHQL, data=data)
+
+        # graphql endpoint supposed to report errors through the json,
+        # so http status error still goes through the simple handler
         if res.status_code != 200:
-            raise errors.Error(
-                "API GraphQL POST {} {}".format(res.status_code, res.json())
-            )
+            raise simple_response_error(res)
 
         data = res.json()
         if "errors" in data.keys():
