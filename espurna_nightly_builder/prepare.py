@@ -50,7 +50,7 @@ def prepare(
 
     commit_file.content = head_sha
     response = builder_repo.update_file(
-        builder_branch, commit_file, "Nightly build ({})".format(nightly_tag())
+        builder_branch, commit_file, f"Nightly build ({nightly_tag()})"
     )
     log.info(
         "updated commit.txt, new nightly branch commit: %s", response["commit"]["sha"]

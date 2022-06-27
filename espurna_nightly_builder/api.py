@@ -49,7 +49,7 @@ class File:
         return data
 
     def __repr__(self):
-        return '<File path="{}" sha={}>'.format(self.path, self.sha)
+        return f"<File path={self.path} sha={self.sha}>"
 
 
 def simple_response_error(response):
@@ -59,9 +59,7 @@ def simple_response_error(response):
         content = "(no json content)"
 
     return errors.Error(
-        "API {} {} {}: {}".format(
-            response.request.method, response.status_code, response.request.url, content
-        )
+        f"API {response.status_code} {response.request.method} {response.request.url} content={content}"
     )
 
 
@@ -76,7 +74,7 @@ class Api:
 
         self._http = requests.Session()
         self._http.headers.update(
-            {"User-Agent": self.USER_AGENT, "Authorization": "token {}".format(token)}
+            {"User-Agent": self.USER_AGENT, "Authorization": f"token {token}"}
         )
 
     def get(self, path, params=None, headers=None, expect_status=200):
@@ -132,9 +130,7 @@ class Api:
         data = res.json()
         if "errors" in data.keys():
             raise errors.Error(
-                "API GraphQL POST errors: {}".format(
-                    ",".join(error["message"] for error in data["errors"])
-                )
+                f"API GraphQL POST errors: {','.join(error['message'] for error in data['errors'])}"
             )
 
         return data
@@ -144,14 +140,14 @@ class Repo:
     def __init__(self, slug, api):
         self.slug = slug
         self.api = api
-        self.base = "repos/{}".format(slug)
+        self.base = f"repos/{slug}"
 
         owner, name = slug.split("/")
         self.owner = owner
         self.name = name
 
     def _base(self, path):
-        return "{}/{}".format(self.base, path)
+        return f"{self.base}/{path}"
 
     def tags(self):
         path = self._base("tags")
@@ -160,12 +156,10 @@ class Repo:
 
     @property
     def clone_url(self):
-        return "https://github.com/{owner}/{name}.git".format(
-            owner=self.owner, name=self.name
-        )
+        return f"https://github.com/{self.owner}/{self.name}.git"
 
     def compare(self, start, end, diff=True):
-        path = self._base("compare/{}...{}".format(start, end))
+        path = self._base(f"compare/{start}...{end}")
 
         headers = {}
         if diff:
@@ -175,7 +169,7 @@ class Repo:
         return res.text
 
     def contents(self, ref, filepath):
-        path = self._base("contents/{}".format(filepath))
+        path = self._base(f"contents/{filepath}")
         return self.api.get_json(path, params={"ref": ref})
 
     def file(self, ref, filepath):
@@ -183,7 +177,7 @@ class Repo:
 
     def update_file(self, branch, fileobj, message):
         return self.api.put_json(
-            self._base("contents/{}".format(fileobj.path)),
+            self._base(f"contents/{fileobj.path}"),
             data={
                 "branch": branch,
                 "message": message,
@@ -193,7 +187,7 @@ class Repo:
         )
 
     def tag_object(self, sha):
-        return self.api.get_json(self._base("git/tags/{}".format(sha)))
+        return self.api.get_json(self._base(f"git/tags/{sha}"))
 
     def add_tag(self, name, message, sha):
         data = {"tag": name, "message": message, "object": sha, "type": "commit"}
@@ -206,7 +200,7 @@ class Repo:
         )
 
     def delete_tag(self, sha):
-        return self.api.delete(self._base("git/tags/{}".format(sha)))
+        return self.api.delete(self._base(f"git/tags/{sha}"))
 
     def add_ref(self, ref, sha):
         return self.api.post_json(
@@ -217,13 +211,13 @@ class Repo:
         )
 
     def delete_ref(self, ref):
-        self.api.delete(self._base("git/refs/{}".format(ref)))
+        self.api.delete(self._base(f"git/refs/{ref}"))
 
     def ref_object(self, ref):
-        return self.api.get_json(self._base("git/ref/{}".format(ref)))
+        return self.api.get_json(self._base(f"git/ref/{ref}"))
 
     def delete_release(self, number):
-        self.api.delete(self._base("releases/{}".format(number)))
+        self.api.delete(self._base(f"releases/{number}"))
 
     def create_release(self, sha, tag, body, name=None, prerelease=False):
         data = {
@@ -238,23 +232,23 @@ class Repo:
         return self.api.post_json(self._base("releases"), data)
 
     def commit_object(self, sha):
-        path = self._base("git/commits/{}".format(sha))
+        path = self._base(f"git/commits/{sha}")
         res = self.api.get(path)
 
         return res.json()
 
     def commit_check_runs(self, sha):
-        path = self._base("commits/{}/check-runs".format(sha))
+        path = self._base(f"commits/{sha}/check-runs")
         res = self.api.get_json(path)
         return (res["total_count"], res["check_runs"])
 
     def branches(self, name):
-        path = self._base("branches/{}".format(name))
+        path = self._base(f"branches/{name}")
         res = self.api.get_json(path)
         return res
 
     def workflow_dispatch(self, workflow_id, ref, inputs=None):
-        path = self._base("actions/workflows/{}/dispatches".format(workflow_id))
+        path = self._base(f"actions/workflows/{workflow_id}/dispatches")
         data = {"ref": ref}
         if inputs:
             data["inputs"] = inputs
@@ -334,13 +328,7 @@ class CommitRange:
 
     @property
     def compare_url(self):
-        url = "https://github.com/{owner}/{name}/compare/{start}...{end}".format(
-            owner=self._repo.owner,
-            name=self._repo.name,
-            start=self._start,
-            end=self._end,
-        )
-        return url
+        return f"https://github.com/{self._repo.owner}/{self._repo.name}/compare/{self._start}...{self._end}"
 
     def path_changed(self, path_match):
         text = self._repo.compare(self._start, self._end, diff=True)

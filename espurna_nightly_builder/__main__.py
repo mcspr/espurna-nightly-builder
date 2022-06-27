@@ -147,7 +147,9 @@ def setup_argparse():
     parser.add_argument("--commit-filename", default="commit.txt")
     parser.add_argument("--target-branch", default="dev")
     parser.add_argument("--builder-branch", default="nightly")
-    parser.add_argument("--version", action="version", version=f"{__package__} {__version__}")
+    parser.add_argument(
+        "--version", action="version", version=f"{__package__} {__version__}"
+    )
     parser.set_defaults(func=lambda _: parser.print_help())
 
     setup_parser_handlers(
