@@ -4,6 +4,7 @@ import os
 import sys
 
 
+from . import __version__
 from . import errors
 from .prepare import Prepare
 from .setup_repo import SetupRepo
@@ -141,10 +142,12 @@ def setup_parser_handlers(root_parser, handlers):
 
 def setup_argparse():
     parser = argparse.ArgumentParser()
+    parser.prog = __package__
     parser.add_argument("--token", default=os.environ.get("GITHUB_TOKEN"))
     parser.add_argument("--commit-filename", default="commit.txt")
     parser.add_argument("--target-branch", default="dev")
     parser.add_argument("--builder-branch", default="nightly")
+    parser.add_argument("--version", action="version", version=f"{__package__} {__version__}")
     parser.set_defaults(func=lambda _: parser.print_help())
 
     setup_parser_handlers(
