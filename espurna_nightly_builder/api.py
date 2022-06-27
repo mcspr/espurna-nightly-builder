@@ -12,6 +12,7 @@ except ImportError:
 
 import requests
 
+from . import __version__
 from . import errors
 
 
@@ -68,7 +69,7 @@ class Api:
 
     BASE_REST = "https://api.github.com/"
     BASE_GRAPHQL = "https://api.github.com/graphql"
-    USER_AGENT = "mcspr/espurna-nightly-builder/builder-v1.0"
+    USER_AGENT = f"mcspr/espurna_nightly_builder-v{__version__}"
 
     def __init__(self, token):
         self.token = token
