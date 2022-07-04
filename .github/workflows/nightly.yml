@@ -55,7 +55,7 @@ jobs:
           path: espurna
           ref: ${{ needs.nightly.outputs.head }}
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
@@ -114,7 +114,7 @@ jobs:
     needs: [nightly, build]
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
