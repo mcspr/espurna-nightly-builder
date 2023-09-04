@@ -17,7 +17,7 @@ jobs:
       head: ${{ steps.commit.outputs.head }}
       previous: ${{ steps.commit.outputs.previous }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
           ref: nightly
@@ -49,7 +49,7 @@ jobs:
       matrix:
         thread: [0, 1, 2, 3]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: ${{ github.event.inputs.target_repo }}
           path: espurna
